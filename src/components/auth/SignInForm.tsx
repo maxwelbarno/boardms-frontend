@@ -8,7 +8,6 @@ import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn, getSession } from 'next-auth/react';
-import { getSystemStatus } from '@/lib/actions/auth';
 import ErrorModal from '@/components/ui/modal/ErrorModal';
 
 interface SystemStatus {
@@ -32,20 +31,6 @@ export default function SignInForm() {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorDetails, setErrorDetails] = useState<any>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    checkSystemStatus();
-  }, []);
-
-  const checkSystemStatus = async () => {
-    try {
-      const status = await getSystemStatus();
-      setSystemStatus(status);
-      console.log('System status:', status);
-    } catch (error) {
-      console.error('Failed to check system status:', error);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevent default form submission
@@ -184,20 +169,11 @@ export default function SignInForm() {
   return (
     <>
       <div className="flex flex-col flex-1 lg:w-1/2 w-full">
-        {/* <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
-          <Link
-            href="/"
-            className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-          >
-            <ChevronLeftIcon />
-            Back to homepage
-          </Link>
-        </div> */}
         <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
           <div>
             <div className="mb-5 sm:mb-8 text-center">
               <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-                boardms System
+                BoardMS System
               </h1>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Government Meeting Management Platform
@@ -291,17 +267,6 @@ export default function SignInForm() {
             </form>
 
             <div className="mt-5">
-              {/* <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400">
-                Demo Access:{" "}
-                <button
-                  type="button"
-                  onClick={fillDemoCredentials}
-                  className="text-brand-500 hover:text-brand-600 dark:text-brand-400 underline"
-                  disabled={isLoading}
-                >
-                  Click to auto-fill credentials
-                </button>
-              </p> */}
               {systemStatus && !systemStatus.users.hasUsers && (
                 <p className="text-xs text-center text-red-500 mt-2">
                   ⚠️ No users found in database. Run: npm run db:seed
