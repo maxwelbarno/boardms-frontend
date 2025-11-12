@@ -1,10 +1,10 @@
 // app/(admin)/audit/page.tsx
-import type { Metadata } from "next";
-import AuditTrail from "@/components/audit/AuditTrail";
+import type { Metadata } from 'next';
+import AuditTrail from '@/components/audit/AuditTrail';
 
 export const metadata: Metadata = {
-  title: "Audit Trail | E-Cabinet System",
-  description: "System activity audit trail and logs",
+  title: 'Audit Trail | E-Cabinet System',
+  description: 'System activity audit trail and logs',
 };
 
 export default function AuditPage() {
@@ -12,9 +12,7 @@ export default function AuditPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Audit Trail
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Audit Trail</h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             Comprehensive log of all system activities and changes
           </p>

@@ -1,10 +1,10 @@
 // app/(admin)/reports/page.tsx
-import type { Metadata } from "next";
-import ReportsDashboard from "@/components/reports/ReportsDashboard";
+import type { Metadata } from 'next';
+import ReportsDashboard from '@/components/reports/ReportsDashboard';
 
 export const metadata: Metadata = {
-  title: "Reports & Analytics | E-Cabinet System",
-  description: "System reports and performance analytics",
+  title: 'Reports & Analytics | E-Cabinet System',
+  description: 'System reports and performance analytics',
 };
 
 export default function ReportsPage() {
@@ -12,9 +12,7 @@ export default function ReportsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Reports & Analytics
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Reports & Analytics</h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             System performance metrics and analytical reports
           </p>

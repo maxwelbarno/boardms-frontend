@@ -1,17 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { query } from "@/lib/db";
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { query } from '@/lib/db';
 
 /**
  * =========================
  * GET /api/memos/[id]
  * =========================
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const result = await query(
       `
@@ -30,11 +27,11 @@ export async function GET(
       LEFT JOIN users u ON gm.created_by = u.id
       WHERE gm.id = $1
       `,
-      [params.id]
+      [params.id],
     );
 
     if (result.rows.length === 0) {
-      return NextResponse.json({ error: "Memo not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Memo not found' }, { status: 404 });
     }
 
     // Fetch affected entities
@@ -46,23 +43,18 @@ export async function GET(
       FROM memo_affected_entities 
       WHERE memo_id = $1
       `,
-      [params.id]
+      [params.id],
     );
 
     const memo = {
       ...result.rows[0],
-      affected_entities: affectedEntities.rows.map(
-        (row) => `${row.entity_type}_${row.entity_id}`
-      ),
+      affected_entities: affectedEntities.rows.map((row) => `${row.entity_type}_${row.entity_id}`),
     };
 
     return NextResponse.json(memo);
   } catch (error: any) {
-    console.error("❌ Error fetching memo:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to fetch memo" },
-      { status: 500 }
-    );
+    console.error('❌ Error fetching memo:', error);
+    return NextResponse.json({ error: error.message || 'Failed to fetch memo' }, { status: 500 });
   }
 }
 
@@ -71,20 +63,17 @@ export async function GET(
  * PUT /api/memos/[id]
  * =========================
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
-    console.log("🟢 Update request body:", body);
-    console.log("🟢 Authenticated user:", session.user);
+    console.log('🟢 Update request body:', body);
+    console.log('🟢 Authenticated user:', session.user);
 
     const {
       name,
@@ -100,24 +89,15 @@ export async function PUT(
     } = body;
 
     // Check if memo exists
-    const existingMemo = await query(
-      "SELECT created_by FROM gov_memos WHERE id = $1",
-      [params.id]
-    );
+    const existingMemo = await query('SELECT created_by FROM gov_memos WHERE id = $1', [params.id]);
 
     if (existingMemo.rows.length === 0) {
-      return NextResponse.json({ error: "Memo not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Memo not found' }, { status: 404 });
     }
 
     // Only allow creator or admin
-    if (
-      existingMemo.rows[0].created_by !== session.user.id &&
-      session.user.role !== "admin"
-    ) {
-      return NextResponse.json(
-        { error: "Unauthorized to update this memo" },
-        { status: 403 }
-      );
+    if (existingMemo.rows[0].created_by !== session.user.id && session.user.role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized to update this memo' }, { status: 403 });
     }
 
     const result = await query(
@@ -152,59 +132,54 @@ export async function PUT(
         state_department_id ? parseInt(state_department_id) : null,
         agency_id ? parseInt(agency_id) : null,
         params.id,
-      ]
+      ],
     );
 
     if (result.rows.length === 0) {
-      return NextResponse.json({ error: "Memo not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Memo not found' }, { status: 404 });
     }
 
     // Update affected entities
-    await query("DELETE FROM memo_affected_entities WHERE memo_id = $1", [
-      params.id,
-    ]);
+    await query('DELETE FROM memo_affected_entities WHERE memo_id = $1', [params.id]);
 
     for (const entity of affected_entities) {
-      const [entityType, id] = entity.split("_");
+      const [entityType, id] = entity.split('_');
       const entityIdNum = parseInt(id);
 
-      if (entityType === "ministry") {
+      if (entityType === 'ministry') {
         await query(
           `
           INSERT INTO memo_affected_entities (memo_id, ministry_id, entity_type)
           VALUES ($1, $2, 'ministry')
           `,
-          [params.id, entityIdNum]
+          [params.id, entityIdNum],
         );
-      } else if (entityType === "state_department") {
+      } else if (entityType === 'state_department') {
         await query(
           `
           INSERT INTO memo_affected_entities (memo_id, state_department_id, entity_type)
           VALUES ($1, $2, 'state_department')
           `,
-          [params.id, entityIdNum]
+          [params.id, entityIdNum],
         );
-      } else if (entityType === "agency") {
+      } else if (entityType === 'agency') {
         await query(
           `
           INSERT INTO memo_affected_entities (memo_id, agency_id, entity_type)
           VALUES ($1, $2, 'agency')
           `,
-          [params.id, entityIdNum]
+          [params.id, entityIdNum],
         );
       }
     }
 
     return NextResponse.json({
-      message: "✅ Memo updated successfully",
+      message: '✅ Memo updated successfully',
       memo: result.rows[0],
     });
   } catch (error: any) {
-    console.error("❌ Error updating memo:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to update memo" },
-      { status: 500 }
-    );
+    console.error('❌ Error updating memo:', error);
+    return NextResponse.json({ error: error.message || 'Failed to update memo' }, { status: 500 });
   }
 }
 
@@ -213,50 +188,40 @@ export async function PUT(
  * DELETE /api/memos/[id]
  * =========================
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const existingMemo = await query(
-      "SELECT created_by, status FROM gov_memos WHERE id = $1",
-      [params.id]
-    );
+    const existingMemo = await query('SELECT created_by, status FROM gov_memos WHERE id = $1', [
+      params.id,
+    ]);
 
     if (existingMemo.rows.length === 0) {
-      return NextResponse.json({ error: "Memo not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Memo not found' }, { status: 404 });
     }
 
     const memo = existingMemo.rows[0];
 
     // Only delete draft memos created by user
-    if (memo.status !== "draft" || memo.created_by !== session.user.id) {
+    if (memo.status !== 'draft' || memo.created_by !== session.user.id) {
       return NextResponse.json(
-        { error: "Can only delete draft memos that you created" },
-        { status: 403 }
+        { error: 'Can only delete draft memos that you created' },
+        { status: 403 },
       );
     }
 
-    const result = await query(
-      "DELETE FROM gov_memos WHERE id = $1 RETURNING *",
-      [params.id]
-    );
+    const result = await query('DELETE FROM gov_memos WHERE id = $1 RETURNING *', [params.id]);
 
     return NextResponse.json({
-      message: "🗑️ Memo deleted successfully",
+      message: '🗑️ Memo deleted successfully',
       memo: result.rows[0],
     });
   } catch (error: any) {
-    console.error("❌ Error deleting memo:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to delete memo" },
-      { status: 500 }
-    );
+    console.error('❌ Error deleting memo:', error);
+    return NextResponse.json({ error: error.message || 'Failed to delete memo' }, { status: 500 });
   }
 }

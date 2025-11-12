@@ -1,11 +1,11 @@
-'use client'
-import Checkbox from "@/components/form/input/Checkbox";
-import Input from "@/components/form/input/InputField";
-import Label from "@/components/form/Label";
-import Button from "@/components/ui/button/Button";
-import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "@/icons";
-import Link from "next/link";
-import React, { useState, useEffect } from "react";
+'use client';
+import Checkbox from '@/components/form/input/Checkbox';
+import Input from '@/components/form/input/InputField';
+import Label from '@/components/form/Label';
+import Button from '@/components/ui/button/Button';
+import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from '@/icons';
+import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn, getSession } from 'next-auth/react';
 import { getSystemStatus } from '@/lib/actions/auth';
@@ -14,7 +14,11 @@ import ErrorModal from '@/components/ui/modal/ErrorModal';
 interface SystemStatus {
   database: { healthy: boolean; error?: string; users?: any[] };
   users: { total: number; hasUsers: boolean; list: any[] };
-  environment: { nodeEnv: string; hasAuthSecret: boolean; hasDatabaseUrl: boolean };
+  environment: {
+    nodeEnv: string;
+    hasAuthSecret: boolean;
+    hasDatabaseUrl: boolean;
+  };
 }
 
 export default function SignInForm() {
@@ -48,7 +52,7 @@ export default function SignInForm() {
     setIsLoading(true);
     setError('');
     setShowErrorModal(false);
-    
+
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
@@ -69,18 +73,18 @@ export default function SignInForm() {
         try {
           const errorData = JSON.parse(result.error);
           console.log('🔴 Parsed error details:', errorData);
-          
+
           // Format user-friendly message with details
           let userMessage = errorData.message;
-          
+
           if (errorData.details?.availableUsers) {
             userMessage += `\n\nAvailable users:\n${errorData.details.availableUsers.join('\n')}`;
           }
-          
+
           if (errorData.details?.suggestion) {
             userMessage += `\n\n💡 ${errorData.details.suggestion}`;
           }
-          
+
           setError(userMessage);
           setErrorDetails(errorData.details);
           setShowErrorModal(true);
@@ -93,14 +97,14 @@ export default function SignInForm() {
         }
       } else if (result?.ok) {
         console.log('✅ SignIn successful, checking session...');
-        
+
         // Wait a moment for the session to be set
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         // Get the updated session
         const session = await getSession();
         console.log('🔍 Session after signin:', session);
-        
+
         if (session) {
           console.log('🎯 Redirecting to dashboard...');
           // Use router.push for client-side navigation (stays on same page until successful)
@@ -111,7 +115,9 @@ export default function SignInForm() {
           }, 100);
         } else {
           setError('Authentication successful but session not found. Please try again.');
-          setErrorDetails({ sessionCheck: 'Session was null after successful signin' });
+          setErrorDetails({
+            sessionCheck: 'Session was null after successful signin',
+          });
           setShowErrorModal(true);
         }
       } else {
@@ -123,9 +129,9 @@ export default function SignInForm() {
       console.error('💥 Auth error:', error);
       const errorMessage = `An unexpected error occurred: ${error instanceof Error ? error.message : 'Unknown error'}`;
       setError(errorMessage);
-      setErrorDetails({ 
+      setErrorDetails({
         stack: error instanceof Error ? error.stack : undefined,
-        fullError: error 
+        fullError: error,
       });
       setShowErrorModal(true);
     } finally {
@@ -136,7 +142,7 @@ export default function SignInForm() {
   const fillDemoCredentials = () => {
     const emailInput = document.querySelector('input[name="email"]') as HTMLInputElement;
     const passwordInput = document.querySelector('input[name="password"]') as HTMLInputElement;
-    
+
     if (emailInput && passwordInput) {
       // Use the first available user email or fallback to demo
       const firstUser = systemStatus?.users.list[0];
@@ -206,40 +212,37 @@ export default function SignInForm() {
                 Enter your credentials to access the system
               </p>
             </div>
-            
+
             {/* Inline error message (small) */}
             {error && !showErrorModal && (
               <div className="p-3 mb-4 text-sm text-red-700 bg-red-100 border border-red-200 rounded-md dark:bg-red-900/20 dark:border-red-800 dark:text-red-300">
                 <strong>Error:</strong> {error.split('\n')[0]}
-                <button
-                  onClick={() => setShowErrorModal(true)}
-                  className="ml-2 text-xs underline"
-                >
+                <button onClick={() => setShowErrorModal(true)} className="ml-2 text-xs underline">
                   View details
                 </button>
               </div>
             )}
-            
+
             <form onSubmit={handleSubmit}>
               <div className="space-y-6">
                 <div>
                   <Label>
-                    Email <span className="text-error-500">*</span>{" "}
+                    Email <span className="text-error-500">*</span>{' '}
                   </Label>
-                  <Input 
-                    placeholder="your.email@gov.go.ke" 
-                    type="email" 
+                  <Input
+                    placeholder="your.email@gov.go.ke"
+                    type="email"
                     name="email"
                     disabled={isLoading}
                   />
                 </div>
                 <div>
                   <Label>
-                    Password <span className="text-error-500">*</span>{" "}
+                    Password <span className="text-error-500">*</span>{' '}
                   </Label>
                   <div className="relative">
                     <Input
-                      type={showPassword ? "text" : "password"}
+                      type={showPassword ? 'text' : 'password'}
                       placeholder="Enter your password"
                       name="password"
                       disabled={isLoading}
@@ -258,11 +261,7 @@ export default function SignInForm() {
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Checkbox 
-                      checked={isChecked} 
-                      onChange={setIsChecked}
-                      disabled={isLoading}
-                    />
+                    <Checkbox checked={isChecked} onChange={setIsChecked} disabled={isLoading} />
                     <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
                       Remember me
                     </span>
@@ -275,11 +274,15 @@ export default function SignInForm() {
                   </Link>
                 </div>
                 <div>
-                  <Button 
-                    className="w-full" 
+                  <Button
+                    className="w-full"
                     size="sm"
                     type="submit"
-                    disabled={isLoading || (systemStatus && !systemStatus.database.healthy) || showErrorModal}
+                    disabled={
+                      isLoading ||
+                      (systemStatus && !systemStatus.database.healthy) ||
+                      showErrorModal
+                    }
                   >
                     {isLoading ? 'Signing in...' : 'Sign in'}
                   </Button>

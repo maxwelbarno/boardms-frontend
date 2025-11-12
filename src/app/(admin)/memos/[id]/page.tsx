@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useParams } from 'next/navigation';
 import { useMemoDetail } from '@/hooks/useMemo';
 import Link from 'next/link';
@@ -26,10 +26,17 @@ export default function MemoDetailPage() {
         <div className="text-center py-8">
           <div className="mx-auto h-12 w-12 text-red-500">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
             </svg>
           </div>
-          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">Error Loading Memo</h3>
+          <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+            Error Loading Memo
+          </h3>
           <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{error}</p>
           <Link
             href="/memos"
@@ -66,11 +73,10 @@ export default function MemoDetailPage() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {memo.name}
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{memo.name}</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2">
-            Originating from <strong>{memo.ministry_name}</strong> on {new Date(memo.created_at).toLocaleDateString()}
+            Originating from <strong>{memo.ministry_name}</strong> on{' '}
+            {new Date(memo.created_at).toLocaleDateString()}
           </p>
         </div>
         <Link
@@ -85,24 +91,34 @@ export default function MemoDetailPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
           <h3 className="font-medium text-gray-900 dark:text-white">Status</h3>
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium mt-2 ${
-            memo.status === 'draft' ? 'bg-gray-100 text-gray-800' :
-            memo.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
-            memo.status === 'approved' ? 'bg-green-100 text-green-800' :
-            'bg-red-100 text-red-800'
-          }`}>
+          <span
+            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium mt-2 ${
+              memo.status === 'draft'
+                ? 'bg-gray-100 text-gray-800'
+                : memo.status === 'submitted'
+                  ? 'bg-blue-100 text-blue-800'
+                  : memo.status === 'approved'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+            }`}
+          >
             {memo.status.charAt(0).toUpperCase() + memo.status.slice(1)}
           </span>
         </div>
 
         <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
           <h3 className="font-medium text-gray-900 dark:text-white">Priority</h3>
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium mt-2 ${
-            memo.priority === 'low' ? 'bg-gray-100 text-gray-800' :
-            memo.priority === 'medium' ? 'bg-blue-100 text-blue-800' :
-            memo.priority === 'high' ? 'bg-orange-100 text-orange-800' :
-            'bg-red-100 text-red-800'
-          }`}>
+          <span
+            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium mt-2 ${
+              memo.priority === 'low'
+                ? 'bg-gray-100 text-gray-800'
+                : memo.priority === 'medium'
+                  ? 'bg-blue-100 text-blue-800'
+                  : memo.priority === 'high'
+                    ? 'bg-orange-100 text-orange-800'
+                    : 'bg-red-100 text-red-800'
+            }`}
+          >
             {memo.priority.charAt(0).toUpperCase() + memo.priority.slice(1)}
           </span>
         </div>
@@ -122,7 +138,8 @@ export default function MemoDetailPage() {
         </h2>
         <div className="space-y-2">
           <div>
-            <span className="font-medium">Ministry:</span> {memo.ministry_name} ({memo.ministry_acronym})
+            <span className="font-medium">Ministry:</span> {memo.ministry_name} (
+            {memo.ministry_acronym})
           </div>
           {memo.state_department_name && (
             <div>
@@ -142,9 +159,7 @@ export default function MemoDetailPage() {
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Executive Summary
         </h2>
-        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-          {memo.summary}
-        </p>
+        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{memo.summary}</p>
       </div>
 
       {/* Body Content */}
@@ -152,18 +167,14 @@ export default function MemoDetailPage() {
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           Detailed Content
         </h2>
-        <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-          {memo.body}
-        </div>
+        <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{memo.body}</div>
       </div>
 
       {/* Debug Info - Remove in production */}
       {process.env.NODE_ENV === 'development' && memo.debug && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <h3 className="font-medium text-yellow-800">Debug Information</h3>
-          <pre className="text-xs mt-2 text-yellow-700">
-            {JSON.stringify(memo.debug, null, 2)}
-          </pre>
+          <pre className="text-xs mt-2 text-yellow-700">{JSON.stringify(memo.debug, null, 2)}</pre>
         </div>
       )}
     </div>

@@ -25,7 +25,6 @@ async function seedDatabase() {
 
     console.log('📊 Database structure created successfully!');
     console.log('🎉 Database setup completed!');
-    
   } catch (error) {
     console.error('❌ Error seeding database:', error);
     process.exit(1);

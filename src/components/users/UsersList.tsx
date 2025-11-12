@@ -1,7 +1,7 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
+'use client';
+import React, { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 interface User {
   id: string;
@@ -29,64 +29,65 @@ interface Ministry {
 }
 
 // Define specific types for roles and statuses
-type UserRole = 
-  | "President"
-  | "Deputy President"
-  | "Prime Cabinet Secretary"
-  | "Cabinet Secretary"
-  | "Principal Secretary"
-  | "Cabinet Secretariat"
-  | "Director"
-  | "Assistant Director"
-  | "Admin"
-  | "Attorney General"
-  | "Secretary to the Cabinet";
+type UserRole =
+  | 'President'
+  | 'Deputy President'
+  | 'Prime Cabinet Secretary'
+  | 'Cabinet Secretary'
+  | 'Principal Secretary'
+  | 'Cabinet Secretariat'
+  | 'Director'
+  | 'Assistant Director'
+  | 'Admin'
+  | 'Attorney General'
+  | 'Secretary to the Cabinet';
 
-type UserStatus = "active" | "inactive" | "pending" | "suspended";
+type UserStatus = 'active' | 'inactive' | 'pending' | 'suspended';
 
 // Use Record type for better TypeScript support
-const roleColors: Record<UserRole | "Admin", string> = {
-  President: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
-  "Deputy President": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-  "Prime Cabinet Secretary": "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300",
-  "Cabinet Secretary": "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-  "Principal Secretary": "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300",
-  "Cabinet Secretariat": "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
-  Director: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300",
-  "Assistant Director": "bg-cyan-50 text-cyan-700 dark:bg-cyan-800 dark:text-cyan-200",
-  Admin: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
-  "Attorney General": "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-  "Secretary to the Cabinet": "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300",
+const roleColors: Record<UserRole | 'Admin', string> = {
+  President: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+  'Deputy President': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  'Prime Cabinet Secretary':
+    'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
+  'Cabinet Secretary': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  'Principal Secretary': 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300',
+  'Cabinet Secretariat': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
+  Director: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300',
+  'Assistant Director': 'bg-cyan-50 text-cyan-700 dark:bg-cyan-800 dark:text-cyan-200',
+  Admin: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+  'Attorney General': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+  'Secretary to the Cabinet': 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300',
 };
 
 const statusColors: Record<UserStatus, string> = {
-  active: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-  inactive: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
-  pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-  suspended: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+  active: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  inactive: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+  pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  suspended: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
 };
 
 const roles: UserRole[] = [
-  "President",
-  "Deputy President",
-  "Prime Cabinet Secretary",
-  "Cabinet Secretary",
-  "Principal Secretary",
-  "Cabinet Secretariat",
-  "Director",
-  "Assistant Director",
-  "Admin",
-  "Attorney General",
-  "Secretary to the Cabinet"
+  'President',
+  'Deputy President',
+  'Prime Cabinet Secretary',
+  'Cabinet Secretary',
+  'Principal Secretary',
+  'Cabinet Secretariat',
+  'Director',
+  'Assistant Director',
+  'Admin',
+  'Attorney General',
+  'Secretary to the Cabinet',
 ];
 
-const statusOptions: UserStatus[] = ["active", "inactive", "pending", "suspended"];
+const statusOptions: UserStatus[] = ['active', 'inactive', 'pending', 'suspended'];
 
 export default function UsersList() {
   const [users, setUsers] = useState<User[]>([]);
   const [ministries, setMinistries] = useState<Ministry[]>([]);
-  const [filter, setFilter] = useState<string>("all");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [filter, setFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -98,14 +99,14 @@ export default function UsersList() {
 
   // Form state
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    image: "",
-    role: "Cabinet Secretary" as UserRole,
-    status: "active" as UserStatus,
-    phone: "",
-    ministry_id: "",
-    password: "",
+    name: '',
+    email: '',
+    image: '',
+    role: 'Cabinet Secretary' as UserRole,
+    status: 'active' as UserStatus,
+    phone: '',
+    ministry_id: '',
+    password: '',
   });
 
   useEffect(() => {
@@ -143,11 +144,12 @@ export default function UsersList() {
     }
   };
 
-  const filteredUsers = users.filter(user => {
-    const matchesFilter = filter === "all" || user.role === filter;
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (user.ministry_name && user.ministry_name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredUsers = users.filter((user) => {
+    const matchesFilter = filter === 'all' || user.role === filter;
+    const matchesSearch =
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.ministry_name && user.ministry_name.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesFilter && matchesSearch;
   });
 
@@ -156,12 +158,12 @@ export default function UsersList() {
     setFormData({
       name: user.name,
       email: user.email,
-      image: user.image || "",
+      image: user.image || '',
       role: user.role as UserRole,
       status: user.status as UserStatus,
-      phone: user.phone || "",
-      ministry_id: user.ministry_id?.toString() || "",
-      password: "", // Don't pre-fill password for security
+      phone: user.phone || '',
+      ministry_id: user.ministry_id?.toString() || '',
+      password: '', // Don't pre-fill password for security
     });
     setIsModalOpen(true);
     setError(null);
@@ -171,14 +173,14 @@ export default function UsersList() {
   const handleCreate = () => {
     setEditingUser(null);
     setFormData({
-      name: "",
-      email: "",
-      image: "",
-      role: "Cabinet Secretary",
-      status: "active",
-      phone: "",
-      ministry_id: "",
-      password: "",
+      name: '',
+      email: '',
+      image: '',
+      role: 'Cabinet Secretary',
+      status: 'active',
+      phone: '',
+      ministry_id: '',
+      password: '',
     });
     setIsModalOpen(true);
     setError(null);
@@ -189,11 +191,11 @@ export default function UsersList() {
     e.preventDefault();
     setError(null);
     setSuccess(null);
-    
+
     try {
       const url = editingUser ? `/api/users/${editingUser.id}` : '/api/users';
       const method = editingUser ? 'PUT' : 'POST';
-      
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -222,7 +224,7 @@ export default function UsersList() {
 
   const handleDelete = async () => {
     if (!userToDelete) return;
-    
+
     setError(null);
     setSuccess(null);
 
@@ -251,14 +253,14 @@ export default function UsersList() {
 
   const resetForm = () => {
     setFormData({
-      name: "",
-      email: "",
-      image: "",
-      role: "Cabinet Secretary",
-      status: "active",
-      phone: "",
-      ministry_id: "",
-      password: "",
+      name: '',
+      email: '',
+      image: '',
+      role: 'Cabinet Secretary',
+      status: 'active',
+      phone: '',
+      ministry_id: '',
+      password: '',
     });
     setEditingUser(null);
     setError(null);
@@ -267,9 +269,9 @@ export default function UsersList() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -281,7 +283,7 @@ export default function UsersList() {
   };
 
   const getMinistryName = (ministryId: number) => {
-    const ministry = ministries.find(m => m.id === ministryId);
+    const ministry = ministries.find((m) => m.id === ministryId);
     return ministry ? `${ministry.name} (${ministry.acronym})` : 'Not assigned';
   };
 
@@ -337,12 +339,16 @@ export default function UsersList() {
               />
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                  <path
+                    fillRule="evenodd"
+                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <select
               value={filter}
@@ -350,17 +356,24 @@ export default function UsersList() {
               className="h-11 rounded-lg border border-gray-300 bg-transparent px-3 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
             >
               <option value="all">All Roles</option>
-              {roles.map(role => (
-                <option key={role} value={role}>{role}</option>
+              {roles.map((role) => (
+                <option key={role} value={role}>
+                  {role}
+                </option>
               ))}
             </select>
-            
+
             <button
               onClick={handleCreate}
               className="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors duration-200"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
               </svg>
               Add User
             </button>
@@ -373,7 +386,12 @@ export default function UsersList() {
         <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800">
           <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <span className="text-sm font-medium">{error}</span>
           </div>
@@ -384,7 +402,12 @@ export default function UsersList() {
         <div className="mx-6 mt-4 p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900/20 dark:border-green-800">
           <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <span className="text-sm font-medium">{success}</span>
           </div>
@@ -397,12 +420,24 @@ export default function UsersList() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-700">
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-300">Cabinet Member</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-300">Role</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-300">Ministry</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-300">Status</th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-300">Last Login</th>
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-500 dark:text-gray-300">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-300">
+                  Cabinet Member
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-300">
+                  Role
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-300">
+                  Ministry
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-300">
+                  Status
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-500 dark:text-gray-300">
+                  Last Login
+                </th>
+                <th className="px-6 py-4 text-right text-sm font-medium text-gray-500 dark:text-gray-300">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
@@ -417,9 +452,7 @@ export default function UsersList() {
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
                           {user.name}
                         </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {user.email}
-                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
                         {user.phone && (
                           <div className="text-xs text-gray-400 dark:text-gray-500">
                             {user.phone}
@@ -429,7 +462,9 @@ export default function UsersList() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getRoleColor(user.role)}`}>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getRoleColor(user.role)}`}
+                    >
                       {user.role}
                     </span>
                   </td>
@@ -437,25 +472,26 @@ export default function UsersList() {
                     {user.ministry_id ? getMinistryName(user.ministry_id) : 'Not assigned'}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(user.status)}`}>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(user.status)}`}
+                    >
                       {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                    {user.last_login 
+                    {user.last_login
                       ? `${new Date(user.last_login).toLocaleDateString()} at ${new Date(user.last_login).toLocaleTimeString()}`
-                      : 'Never'
-                    }
+                      : 'Never'}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button 
+                      <button
                         onClick={() => handleEdit(user)}
                         className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors duration-200"
                       >
                         Edit
                       </button>
-                      <button 
+                      <button
                         onClick={() => openDeleteModal(user)}
                         className="rounded-lg bg-red-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-600 transition-colors duration-200"
                       >
@@ -471,12 +507,24 @@ export default function UsersList() {
 
         {filteredUsers.length === 0 && (
           <div className="py-12 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
+              />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No cabinet members found</h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+              No cabinet members found
+            </h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {searchTerm ? "Try adjusting your search terms" : "No cabinet members available"}
+              {searchTerm ? 'Try adjusting your search terms' : 'No cabinet members available'}
             </p>
           </div>
         )}
@@ -491,14 +539,19 @@ export default function UsersList() {
                 {editingUser ? 'Edit User' : 'Add New User'}
               </h2>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               {/* Error and Success Messages in Modal */}
               {error && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800">
                   <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     <span className="text-sm font-medium">{error}</span>
                   </div>
@@ -509,7 +562,12 @@ export default function UsersList() {
                 <div className="p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900/20 dark:border-green-800">
                   <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     <span className="text-sm font-medium">{success}</span>
                   </div>
@@ -530,10 +588,11 @@ export default function UsersList() {
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Enter a full URL, relative path (/images/users/photo.jpg), or just filename (photo.jpg)
+                    Enter a full URL, relative path (/images/users/photo.jpg), or just filename
+                    (photo.jpg)
                   </p>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Full Name *
@@ -547,7 +606,7 @@ export default function UsersList() {
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Email *
@@ -573,8 +632,10 @@ export default function UsersList() {
                     required
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                   >
-                    {roles.map(role => (
-                      <option key={role} value={role}>{role}</option>
+                    {roles.map((role) => (
+                      <option key={role} value={role}>
+                        {role}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -590,7 +651,7 @@ export default function UsersList() {
                     required
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                   >
-                    {statusOptions.map(status => (
+                    {statusOptions.map((status) => (
                       <option key={status} value={status}>
                         {status.charAt(0).toUpperCase() + status.slice(1)}
                       </option>
@@ -609,7 +670,7 @@ export default function UsersList() {
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                   >
                     <option value="">Select Ministry</option>
-                    {ministries.map(ministry => (
+                    {ministries.map((ministry) => (
                       <option key={ministry.id} value={ministry.id}>
                         {ministry.name} ({ministry.acronym})
                       </option>
@@ -678,13 +739,18 @@ export default function UsersList() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Are you sure you want to delete {userToDelete.name}? This action cannot be undone.
               </p>
-              
+
               {/* Error Message in Delete Modal */}
               {error && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800 mb-4">
                   <div className="flex items-center gap-2 text-red-700 dark:text-red-400">
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     <span className="text-sm">{error}</span>
                   </div>
@@ -695,7 +761,12 @@ export default function UsersList() {
                 <div className="p-3 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900/20 dark:border-green-800 mb-4">
                   <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     <span className="text-sm">{success}</span>
                   </div>
@@ -727,7 +798,7 @@ export default function UsersList() {
 // Separate component for user avatar with proper image handling
 function UserAvatar({ user }: { user: User }) {
   const [imageError, setImageError] = useState(false);
-  
+
   const getUserImage = (user: User) => {
     if (user.image) {
       // Handle both absolute URLs and relative paths
@@ -741,7 +812,11 @@ function UserAvatar({ user }: { user: User }) {
   };
 
   const getUserInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
   };
 
   const imageUrl = getUserImage(user);
@@ -749,9 +824,7 @@ function UserAvatar({ user }: { user: User }) {
   if (!imageUrl || imageError) {
     return (
       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-500/10">
-        <span className="text-sm font-medium text-brand-500">
-          {getUserInitials(user.name)}
-        </span>
+        <span className="text-sm font-medium text-brand-500">{getUserInitials(user.name)}</span>
       </div>
     );
   }

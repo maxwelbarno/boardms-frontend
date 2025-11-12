@@ -51,7 +51,7 @@ export function useMemos(filters?: { status?: string; type?: string }) {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams();
       if (filters?.status && filters.status !== 'all') {
         params.append('status', filters.status);
@@ -61,11 +61,11 @@ export function useMemos(filters?: { status?: string; type?: string }) {
       }
 
       const response = await fetch(`/api/memos?${params}`);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch memos: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
       setMemos(data);
     } catch (err) {
@@ -94,12 +94,12 @@ export function useMemos(filters?: { status?: string; type?: string }) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to create memo');
       }
-      
+
       const newMemo = await response.json();
-      
+
       // Refresh the list
       await fetchMemos();
-      
+
       return newMemo;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to create memo';
@@ -121,12 +121,12 @@ export function useMemos(filters?: { status?: string; type?: string }) {
       if (!response.ok) {
         throw new Error('Failed to update memo');
       }
-      
+
       const updatedMemo = await response.json();
-      
+
       // Update local state
-      setMemos(prev => prev.map(memo => memo.id === id ? updatedMemo : memo));
-      
+      setMemos((prev) => prev.map((memo) => (memo.id === id ? updatedMemo : memo)));
+
       return updatedMemo;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to update memo';
@@ -144,10 +144,10 @@ export function useMemos(filters?: { status?: string; type?: string }) {
       if (!response.ok) {
         throw new Error('Failed to delete memo');
       }
-      
+
       // Update local state
-      setMemos(prev => prev.filter(memo => memo.id !== id));
-      
+      setMemos((prev) => prev.filter((memo) => memo.id !== id));
+
       return { success: true };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to delete memo';
@@ -156,13 +156,13 @@ export function useMemos(filters?: { status?: string; type?: string }) {
     }
   };
 
-  return { 
-    memos, 
-    loading, 
-    error, 
-    createMemo, 
+  return {
+    memos,
+    loading,
+    error,
+    createMemo,
     updateMemo,
     deleteMemo,
-    refetch: fetchMemos 
+    refetch: fetchMemos,
   };
 }

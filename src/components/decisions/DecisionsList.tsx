@@ -1,52 +1,52 @@
 // app/components/decisions/DecisionsList.tsx
-"use client";
-import React, { useState } from "react";
+'use client';
+import React, { useState } from 'react';
 
 const decisions = [
   {
-    id: "DEC-001",
-    title: "Approval of Infrastructure Development Plan",
-    memo: "MEM-001 - Infrastructure Development Proposal",
-    committee: "Infrastructure & Energy",
-    decisionDate: "2024-01-12",
-    status: "implemented",
-    implementationDeadline: "2024-06-30",
-    responsibleMinistry: "Ministry of Transport",
+    id: 'DEC-001',
+    title: 'Approval of Infrastructure Development Plan',
+    memo: 'MEM-001 - Infrastructure Development Proposal',
+    committee: 'Infrastructure & Energy',
+    decisionDate: '2024-01-12',
+    status: 'implemented',
+    implementationDeadline: '2024-06-30',
+    responsibleMinistry: 'Ministry of Transport',
   },
   {
-    id: "DEC-002",
-    title: "Healthcare Funding Allocation Approved",
-    memo: "MEM-002 - Healthcare Funding Allocation",
-    committee: "Social Services",
-    decisionDate: "2024-01-10",
-    status: "in_progress",
-    implementationDeadline: "2024-03-31",
-    responsibleMinistry: "Ministry of Health",
+    id: 'DEC-002',
+    title: 'Healthcare Funding Allocation Approved',
+    memo: 'MEM-002 - Healthcare Funding Allocation',
+    committee: 'Social Services',
+    decisionDate: '2024-01-10',
+    status: 'in_progress',
+    implementationDeadline: '2024-03-31',
+    responsibleMinistry: 'Ministry of Health',
   },
   {
-    id: "DEC-003",
-    title: "Education Policy Reform Framework Endorsed",
-    memo: "MEM-003 - Education Policy Reform",
-    committee: "Social Services",
-    decisionDate: "2024-01-15",
-    status: "pending",
-    implementationDeadline: "2024-12-31",
-    responsibleMinistry: "Ministry of Education",
+    id: 'DEC-003',
+    title: 'Education Policy Reform Framework Endorsed',
+    memo: 'MEM-003 - Education Policy Reform',
+    committee: 'Social Services',
+    decisionDate: '2024-01-15',
+    status: 'pending',
+    implementationDeadline: '2024-12-31',
+    responsibleMinistry: 'Ministry of Education',
   },
 ];
 
 const statusColors = {
-  pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-  in_progress: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-  implemented: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-  delayed: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+  pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  in_progress: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  implemented: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  delayed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
 };
 
 export default function DecisionsList() {
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState('all');
 
-  const filteredDecisions = decisions.filter(decision => 
-    filter === "all" || decision.status === filter
+  const filteredDecisions = decisions.filter(
+    (decision) => filter === 'all' || decision.status === filter,
   );
 
   return (
@@ -104,9 +104,7 @@ export default function DecisionsList() {
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                       {decision.title}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {decision.id}
-                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">{decision.id}</div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
@@ -119,8 +117,11 @@ export default function DecisionsList() {
                   {new Date(decision.decisionDate).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[decision.status]}`}>
-                    {decision.status.replace('_', ' ').charAt(0).toUpperCase() + decision.status.replace('_', ' ').slice(1)}
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[decision.status]}`}
+                  >
+                    {decision.status.replace('_', ' ').charAt(0).toUpperCase() +
+                      decision.status.replace('_', ' ').slice(1)}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
@@ -141,12 +142,24 @@ export default function DecisionsList() {
 
         {filteredDecisions.length === 0 && (
           <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No decisions found</h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+              No decisions found
+            </h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {filter !== "all" ? "Try adjusting your filter" : "No cabinet decisions available"}
+              {filter !== 'all' ? 'Try adjusting your filter' : 'No cabinet decisions available'}
             </p>
           </div>
         )}

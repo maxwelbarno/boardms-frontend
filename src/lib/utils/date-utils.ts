@@ -22,10 +22,14 @@ export function getSystemTimezone(): string {
 /**
  * Format date according to system date format and timezone
  */
-export function formatDate(date: Date, dateFormat: string = 'YYYY-MM-DD', timezone?: string): string {
+export function formatDate(
+  date: Date,
+  dateFormat: string = 'YYYY-MM-DD',
+  timezone?: string,
+): string {
   const targetTimezone = timezone || systemTimezone;
   const dateInTimezone = toTimezone(date, targetTimezone);
-  
+
   const year = dateInTimezone.getFullYear();
   const month = String(dateInTimezone.getMonth() + 1).padStart(2, '0');
   const day = String(dateInTimezone.getDate()).padStart(2, '0');
@@ -55,13 +59,13 @@ export function formatDate(date: Date, dateFormat: string = 'YYYY-MM-DD', timezo
 export function formatDateTime(date: Date, timezone?: string): string {
   const targetTimezone = timezone || systemTimezone;
   const dateInTimezone = toTimezone(date, targetTimezone);
-  
+
   const year = dateInTimezone.getFullYear();
   const month = String(dateInTimezone.getMonth() + 1).padStart(2, '0');
   const day = String(dateInTimezone.getDate()).padStart(2, '0');
   const hours = String(dateInTimezone.getHours()).padStart(2, '0');
   const minutes = String(dateInTimezone.getMinutes()).padStart(2, '0');
-  
+
   return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
@@ -71,13 +75,13 @@ export function formatDateTime(date: Date, timezone?: string): string {
 export function formatDateForInput(date: Date, timezone?: string): string {
   const targetTimezone = timezone || systemTimezone;
   const dateInTimezone = toTimezone(date, targetTimezone);
-  
+
   const year = dateInTimezone.getFullYear();
   const month = String(dateInTimezone.getMonth() + 1).padStart(2, '0');
   const day = String(dateInTimezone.getDate()).padStart(2, '0');
   const hours = String(dateInTimezone.getHours()).padStart(2, '0');
   const minutes = String(dateInTimezone.getMinutes()).padStart(2, '0');
-  
+
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
@@ -86,29 +90,31 @@ export function formatDateForInput(date: Date, timezone?: string): string {
  */
 export function parseDateFromInput(dateString: string, timezone?: string): Date {
   const targetTimezone = timezone || systemTimezone;
-  
+
   // datetime-local input is in local browser time
   const localDate = new Date(dateString);
-  
+
   if (targetTimezone === 'UTC') {
     // Return as UTC
-    return new Date(Date.UTC(
-      localDate.getFullYear(),
-      localDate.getMonth(),
-      localDate.getDate(),
-      localDate.getHours(),
-      localDate.getMinutes()
-    ));
+    return new Date(
+      Date.UTC(
+        localDate.getFullYear(),
+        localDate.getMonth(),
+        localDate.getDate(),
+        localDate.getHours(),
+        localDate.getMinutes(),
+      ),
+    );
   } else {
     // Convert from local browser time to target timezone
     const localISOString = localDate.toISOString();
     const targetDate = new Date(localISOString);
-    
+
     // Adjust for timezone difference
     const localOffset = localDate.getTimezoneOffset();
     const targetOffset = getTimezoneOffset(targetTimezone);
     const offsetDiff = targetOffset - localOffset;
-    
+
     return new Date(targetDate.getTime() + offsetDiff * 60000);
   }
 }
@@ -118,15 +124,17 @@ export function parseDateFromInput(dateString: string, timezone?: string): Date 
  */
 export function toTimezone(date: Date, timezone: string = 'UTC'): Date {
   if (timezone === 'UTC') {
-    return new Date(Date.UTC(
-      date.getUTCFullYear(),
-      date.getUTCMonth(),
-      date.getUTCDate(),
-      date.getUTCHours(),
-      date.getUTCMinutes()
-    ));
+    return new Date(
+      Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        date.getUTCDate(),
+        date.getUTCHours(),
+        date.getUTCMinutes(),
+      ),
+    );
   }
-  
+
   try {
     // Use Intl.DateTimeFormat for reliable timezone conversion
     const formatter = new Intl.DateTimeFormat('en-US', {
@@ -136,31 +144,33 @@ export function toTimezone(date: Date, timezone: string = 'UTC'): Date {
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false,
     });
-    
+
     const parts = formatter.formatToParts(date);
-    const year = parts.find(part => part.type === 'year')?.value;
-    const month = parts.find(part => part.type === 'month')?.value;
-    const day = parts.find(part => part.type === 'day')?.value;
-    const hour = parts.find(part => part.type === 'hour')?.value;
-    const minute = parts.find(part => part.type === 'minute')?.value;
-    
+    const year = parts.find((part) => part.type === 'year')?.value;
+    const month = parts.find((part) => part.type === 'month')?.value;
+    const day = parts.find((part) => part.type === 'day')?.value;
+    const hour = parts.find((part) => part.type === 'hour')?.value;
+    const minute = parts.find((part) => part.type === 'minute')?.value;
+
     if (year && month && day && hour && minute) {
       return new Date(`${year}-${month}-${day}T${hour}:${minute}:00.000Z`);
     }
   } catch (error) {
     console.warn(`Failed to convert to timezone ${timezone}, using UTC:`, error);
   }
-  
+
   // Fallback to UTC
-  return new Date(Date.UTC(
-    date.getUTCFullYear(),
-    date.getUTCMonth(),
-    date.getUTCDate(),
-    date.getUTCHours(),
-    date.getUTCMinutes()
-  ));
+  return new Date(
+    Date.UTC(
+      date.getUTCFullYear(),
+      date.getUTCMonth(),
+      date.getUTCDate(),
+      date.getUTCHours(),
+      date.getUTCMinutes(),
+    ),
+  );
 }
 
 /**
@@ -168,7 +178,7 @@ export function toTimezone(date: Date, timezone: string = 'UTC'): Date {
  */
 export function getTimezoneOffset(timezone: string = 'UTC'): number {
   if (timezone === 'UTC') return 0;
-  
+
   try {
     const date = new Date();
     const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
@@ -187,10 +197,12 @@ export function isSameDay(date1: Date, date2: Date, timezone?: string): boolean 
   const targetTimezone = timezone || systemTimezone;
   const d1 = toTimezone(date1, targetTimezone);
   const d2 = toTimezone(date2, targetTimezone);
-  
-  return d1.getFullYear() === d2.getFullYear() &&
-         d1.getMonth() === d2.getMonth() &&
-         d1.getDate() === d2.getDate();
+
+  return (
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+  );
 }
 
 /**
@@ -210,7 +222,11 @@ export function getCurrentSystemDate(): Date {
   return toTimezone(new Date(), systemTimezone);
 }
 // Add this to your existing date-utils.ts
-export const formatSystemDate = (date: Date, includeTime: boolean = false, timezone?: string): string => {
+export const formatSystemDate = (
+  date: Date,
+  includeTime: boolean = false,
+  timezone?: string,
+): string => {
   if (includeTime) {
     return formatDateTime(date, timezone);
   }

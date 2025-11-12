@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useState } from 'react';
 import { Plus, Loader2 } from 'lucide-react';
 
@@ -16,7 +16,7 @@ const QuickAddAgenda: React.FC<QuickAddAgendaProps> = ({ meetingId, onAgendaAdde
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.name.trim()) {
       alert('Agenda name is required');
       return;
@@ -24,10 +24,10 @@ const QuickAddAgenda: React.FC<QuickAddAgendaProps> = ({ meetingId, onAgendaAdde
 
     try {
       setIsLoading(true);
-      
+
       // Get the next sort_order directly by fetching current agenda items
       const nextSortOrder = await getNextSortOrder(meetingId);
-      
+
       console.log('🔢 Next sort order calculated:', nextSortOrder);
 
       // Prepare minimal data that matches your database schema
@@ -41,7 +41,7 @@ const QuickAddAgenda: React.FC<QuickAddAgendaProps> = ({ meetingId, onAgendaAdde
         ministry_id: null, // Set to null
         cabinet_approval_required: false,
         memo_id: null, // Add this required field
-        created_by: null // Add this required field
+        created_by: null, // Add this required field
       };
 
       console.log('🔄 Adding agenda with data:', agendaData);
@@ -68,10 +68,9 @@ const QuickAddAgenda: React.FC<QuickAddAgendaProps> = ({ meetingId, onAgendaAdde
         name: '',
       });
       setIsOpen(false);
-      
+
       // Notify parent component
       onAgendaAdded();
-      
     } catch (error) {
       console.error('❌ Error adding agenda:', error);
       alert(error instanceof Error ? error.message : 'Failed to add agenda item');
@@ -84,28 +83,28 @@ const QuickAddAgenda: React.FC<QuickAddAgendaProps> = ({ meetingId, onAgendaAdde
   const getNextSortOrder = async (meetingId: string): Promise<number> => {
     try {
       console.log('🔄 Fetching current agenda items for meeting:', meetingId);
-      
+
       const response = await fetch(`/api/agenda?meetingId=${meetingId}`);
-      
+
       if (response.ok) {
         const agendaItems = await response.json();
         console.log('📋 Current agenda items:', agendaItems);
-        
+
         if (agendaItems.length === 0) {
           console.log('📝 No existing agenda items, starting with 1');
           return 1;
         }
-        
+
         // Find the highest sort_order
         const maxSortOrder = Math.max(...agendaItems.map((item: any) => item.sort_order || 0));
         const nextSortOrder = maxSortOrder + 1;
-        
+
         console.log('🔢 Sort order calculation:', {
           maxSortOrder,
           nextSortOrder,
-          totalItems: agendaItems.length
+          totalItems: agendaItems.length,
         });
-        
+
         return nextSortOrder;
       } else {
         console.warn('⚠️ Failed to fetch agenda items, defaulting to 1');
@@ -119,9 +118,9 @@ const QuickAddAgenda: React.FC<QuickAddAgendaProps> = ({ meetingId, onAgendaAdde
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -144,10 +143,13 @@ const QuickAddAgenda: React.FC<QuickAddAgendaProps> = ({ meetingId, onAgendaAdde
       <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">
         Quick Add Agenda Item
       </h3>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+          >
             Agenda Item Name *
           </label>
           <input
@@ -179,7 +181,7 @@ const QuickAddAgenda: React.FC<QuickAddAgendaProps> = ({ meetingId, onAgendaAdde
             )}
             {isLoading ? 'Adding...' : 'Add Agenda Item'}
           </button>
-          
+
           <button
             type="button"
             onClick={() => setIsOpen(false)}

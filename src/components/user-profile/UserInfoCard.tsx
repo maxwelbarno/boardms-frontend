@@ -1,22 +1,22 @@
-"use client";
-import React from "react";
-import { useModal } from "../../hooks/useModal";
-import { Modal } from "../ui/modal";
-import Button from "../ui/button/Button";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
-import { useSession } from "next-auth/react";
+'use client';
+import React from 'react';
+import { useModal } from '../../hooks/useModal';
+import { Modal } from '../ui/modal';
+import Button from '../ui/button/Button';
+import Input from '../form/input/InputField';
+import Label from '../form/Label';
+import { useSession } from 'next-auth/react';
 
 export default function UserInfoCard() {
   const { isOpen, openModal, closeModal } = useModal();
   const { data: session, status } = useSession();
-  
-  const isLoading = status === "loading";
+
+  const isLoading = status === 'loading';
   const user = session?.user;
 
   const handleSave = () => {
     // Handle save logic here - you can integrate with your API
-    console.log("Saving changes...");
+    console.log('Saving changes...');
     closeModal();
   };
 
@@ -27,7 +27,7 @@ export default function UserInfoCard() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex-1">
             <div className="h-6 w-40 bg-gray-200 dark:bg-gray-700 rounded mb-6 animate-pulse"></div>
-            
+
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
               {[...Array(5)].map((_, i) => (
                 <div key={i}>
@@ -66,9 +66,7 @@ export default function UserInfoCard() {
               <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                 First Name
               </p>
-              <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                {firstName}
-              </p>
+              <p className="text-sm font-medium text-gray-800 dark:text-white/90">{firstName}</p>
             </div>
 
             <div>
@@ -90,9 +88,7 @@ export default function UserInfoCard() {
             </div>
 
             <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                Role
-              </p>
+              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Role</p>
               <p className="text-sm font-medium text-gray-800 dark:text-white/90">
                 {user.role || 'Team Member'}
               </p>
@@ -108,14 +104,10 @@ export default function UserInfoCard() {
             </div>
 
             <div>
-              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
-                Status
-              </p>
+              <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Status</p>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <p className="text-sm font-medium text-gray-800 dark:text-white/90">
-                  Active
-                </p>
+                <p className="text-sm font-medium text-gray-800 dark:text-white/90">Active</p>
               </div>
             </div>
           </div>
@@ -164,34 +156,22 @@ export default function UserInfoCard() {
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div>
                     <Label>Facebook</Label>
-                    <Input
-                      type="text"
-                      placeholder="https://facebook.com/yourprofile"
-                    />
+                    <Input type="text" placeholder="https://facebook.com/yourprofile" />
                   </div>
 
                   <div>
                     <Label>X.com</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="https://x.com/yourprofile" 
-                    />
+                    <Input type="text" placeholder="https://x.com/yourprofile" />
                   </div>
 
                   <div>
                     <Label>Linkedin</Label>
-                    <Input
-                      type="text"
-                      placeholder="https://linkedin.com/in/yourprofile"
-                    />
+                    <Input type="text" placeholder="https://linkedin.com/in/yourprofile" />
                   </div>
 
                   <div>
                     <Label>Instagram</Label>
-                    <Input
-                      type="text"
-                      placeholder="https://instagram.com/yourprofile"
-                    />
+                    <Input type="text" placeholder="https://instagram.com/yourprofile" />
                   </div>
                 </div>
               </div>
@@ -203,26 +183,18 @@ export default function UserInfoCard() {
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div className="col-span-2 lg:col-span-1">
                     <Label>First Name</Label>
-                    <Input 
-                      type="text" 
-                      defaultValue={firstName}
-                      placeholder="First name"
-                    />
+                    <Input type="text" defaultValue={firstName} placeholder="First name" />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Last Name</Label>
-                    <Input 
-                      type="text" 
-                      defaultValue={lastName}
-                      placeholder="Last name"
-                    />
+                    <Input type="text" defaultValue={lastName} placeholder="Last name" />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Email Address</Label>
-                    <Input 
-                      type="email" 
+                    <Input
+                      type="email"
                       defaultValue={user.email || ''}
                       placeholder="Email address"
                       disabled // Email is usually not editable
@@ -231,16 +203,13 @@ export default function UserInfoCard() {
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Phone</Label>
-                    <Input 
-                      type="tel" 
-                      placeholder="+1 234 567 8900" 
-                    />
+                    <Input type="tel" placeholder="+1 234 567 8900" />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Role/Position</Label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       defaultValue={user.role || ''}
                       placeholder="Your role or position"
                     />
@@ -248,15 +217,12 @@ export default function UserInfoCard() {
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Department</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="Your department"
-                    />
+                    <Input type="text" placeholder="Your department" />
                   </div>
 
                   <div className="col-span-2">
                     <Label>Bio</Label>
-                    <textarea 
+                    <textarea
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white resize-none"
                       rows={3}
                       placeholder="Tell us about yourself, your experience, and your role..."
@@ -266,8 +232,8 @@ export default function UserInfoCard() {
 
                   <div className="col-span-2">
                     <Label>Office Location</Label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       placeholder="e.g., Nairobi Headquarters, Mombasa Regional Office"
                     />
                   </div>
@@ -282,18 +248,12 @@ export default function UserInfoCard() {
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div>
                     <Label>Employee ID</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="GOK-EMP-XXXXX"
-                    />
+                    <Input type="text" placeholder="GOK-EMP-XXXXX" />
                   </div>
 
                   <div>
                     <Label>Ministry/Department</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="e.g., Ministry of Interior"
-                    />
+                    <Input type="text" placeholder="e.g., Ministry of Interior" />
                   </div>
 
                   <div>
@@ -309,11 +269,7 @@ export default function UserInfoCard() {
 
                   <div>
                     <Label>Access Level</Label>
-                    <Input 
-                      type="text" 
-                      defaultValue={user.role || 'Standard'}
-                      disabled
-                    />
+                    <Input type="text" defaultValue={user.role || 'Standard'} disabled />
                   </div>
                 </div>
               </div>

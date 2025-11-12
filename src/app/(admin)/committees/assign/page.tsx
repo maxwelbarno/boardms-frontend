@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
-import AssignMembers from "@/components/committees/AssignMembers";
+import type { Metadata } from 'next';
+import AssignMembers from '@/components/committees/AssignMembers';
 
 export const metadata: Metadata = {
-  title: "Assign Committee Members | E-Cabinet System",
-  description: "Assign members to cabinet committees",
+  title: 'Assign Committee Members | E-Cabinet System',
+  description: 'Assign members to cabinet committees',
 };
 
 export default function AssignMembersPage() {

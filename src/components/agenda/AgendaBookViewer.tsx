@@ -1,7 +1,7 @@
 // app/components/agendas/AgendaBookViewer.tsx
-"use client";
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+'use client';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Agenda {
   id: string;
@@ -94,7 +94,7 @@ export default function AgendaBookViewer({ agendaId }: AgendaBookViewerProps) {
         body: formData,
       });
       const newFile = await response.json();
-      setFiles(prev => [...prev, newFile]);
+      setFiles((prev) => [...prev, newFile]);
     } catch (error) {
       console.error('Error uploading file:', error);
     }
@@ -114,16 +114,18 @@ export default function AgendaBookViewer({ agendaId }: AgendaBookViewerProps) {
           file_id: files[currentFileIndex].id,
         }),
       });
-      
+
       const newAnnotation = await response.json();
-      
+
       // Update local state
-      setFiles(prev => prev.map((file, index) => 
-        index === currentFileIndex 
-          ? { ...file, annotations: [...file.annotations, newAnnotation] }
-          : file
-      ));
-      
+      setFiles((prev) =>
+        prev.map((file, index) =>
+          index === currentFileIndex
+            ? { ...file, annotations: [...file.annotations, newAnnotation] }
+            : file,
+        ),
+      );
+
       setNewAnnotation(null);
     } catch (error) {
       console.error('Error adding annotation:', error);
@@ -157,7 +159,7 @@ export default function AgendaBookViewer({ agendaId }: AgendaBookViewerProps) {
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => setCurrentFileIndex(prev => Math.max(0, prev - 1))}
+              onClick={() => setCurrentFileIndex((prev) => Math.max(0, prev - 1))}
               disabled={currentFileIndex === 0}
               className="px-3 py-1 border rounded disabled:opacity-50"
             >
@@ -167,14 +169,14 @@ export default function AgendaBookViewer({ agendaId }: AgendaBookViewerProps) {
               File {currentFileIndex + 1} of {files.length}
             </span>
             <button
-              onClick={() => setCurrentFileIndex(prev => Math.min(files.length - 1, prev + 1))}
+              onClick={() => setCurrentFileIndex((prev) => Math.min(files.length - 1, prev + 1))}
               disabled={currentFileIndex === files.length - 1}
               className="px-3 py-1 border rounded disabled:opacity-50"
             >
               Next
             </button>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <span className="text-sm font-medium">{currentFile.file_name}</span>
             <input
@@ -194,22 +196,24 @@ export default function AgendaBookViewer({ agendaId }: AgendaBookViewerProps) {
             <div className="bg-white p-8 rounded-lg shadow-lg max-w-2xl w-full">
               <h3 className="text-xl font-bold mb-4">{currentFile.file_name}</h3>
               <p className="text-gray-600 mb-4">
-                File type: {currentFile.file_type} • Size: {(currentFile.file_size / 1024 / 1024).toFixed(2)} MB
+                File type: {currentFile.file_type} • Size:{' '}
+                {(currentFile.file_size / 1024 / 1024).toFixed(2)} MB
               </p>
-              
+
               {/* Document preview placeholder */}
               <div className="border-2 border-dashed border-gray-300 rounded-lg h-96 flex items-center justify-center">
-                <p className="text-gray-500">
-                  Document preview for {currentFile.file_type} files
-                </p>
+                <p className="text-gray-500">Document preview for {currentFile.file_type} files</p>
               </div>
 
               {/* Annotations display */}
               {currentFile.annotations.length > 0 && (
                 <div className="mt-6">
                   <h4 className="font-semibold mb-2">Annotations:</h4>
-                  {currentFile.annotations.map(annotation => (
-                    <div key={annotation.id} className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-2">
+                  {currentFile.annotations.map((annotation) => (
+                    <div
+                      key={annotation.id}
+                      className="bg-yellow-50 border-l-4 border-yellow-400 p-3 mb-2"
+                    >
                       <p className="text-sm">{annotation.comment}</p>
                       <p className="text-xs text-gray-500 mt-1">- {annotation.author}</p>
                     </div>
@@ -219,7 +223,15 @@ export default function AgendaBookViewer({ agendaId }: AgendaBookViewerProps) {
 
               {/* Add annotation button */}
               <button
-                onClick={() => setNewAnnotation({ x: 50, y: 50, width: 200, height: 100, comment: '' })}
+                onClick={() =>
+                  setNewAnnotation({
+                    x: 50,
+                    y: 50,
+                    width: 200,
+                    height: 100,
+                    comment: '',
+                  })
+                }
                 className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
               >
                 Add Annotation
@@ -230,7 +242,12 @@ export default function AgendaBookViewer({ agendaId }: AgendaBookViewerProps) {
                 <div className="mt-4 p-4 border rounded bg-white">
                   <textarea
                     value={newAnnotation.comment || ''}
-                    onChange={(e) => setNewAnnotation(prev => ({ ...prev, comment: e.target.value }))}
+                    onChange={(e) =>
+                      setNewAnnotation((prev) => ({
+                        ...prev,
+                        comment: e.target.value,
+                      }))
+                    }
                     placeholder="Enter your annotation..."
                     className="w-full p-2 border rounded mb-2"
                     rows={3}
@@ -263,27 +280,23 @@ export default function AgendaBookViewer({ agendaId }: AgendaBookViewerProps) {
       {/* Sidebar - Agenda Items */}
       <div className="w-80 bg-white border-r border-gray-200 overflow-y-auto">
         <div className="p-6">
-          <button 
+          <button
             onClick={() => router.back()}
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-6"
           >
             ← Back to Meetings
           </button>
-          
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Cabinet Meeting
-          </h1>
-          <p className="text-sm text-gray-600 mb-6">
-            January 2024 • Conference Room A
-          </p>
+
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Cabinet Meeting</h1>
+          <p className="text-sm text-gray-600 mb-6">January 2024 • Conference Room A</p>
 
           <div className="space-y-2">
             {agendas.map((agenda) => (
               <div
                 key={agenda.id}
                 className={`p-4 rounded-lg border cursor-pointer ${
-                  agendaId === agenda.id 
-                    ? 'border-blue-500 bg-blue-50' 
+                  agendaId === agenda.id
+                    ? 'border-blue-500 bg-blue-50'
                     : 'border-gray-200 hover:bg-gray-50'
                 }`}
                 onClick={() => router.push(`/agendas/${agenda.id}/book`)}
@@ -298,11 +311,15 @@ export default function AgendaBookViewer({ agendaId }: AgendaBookViewerProps) {
                       </p>
                     )}
                   </div>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    agenda.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                    agenda.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      agenda.status === 'confirmed'
+                        ? 'bg-green-100 text-green-800'
+                        : agenda.status === 'in_progress'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-gray-100 text-gray-800'
+                    }`}
+                  >
                     {agenda.status}
                   </span>
                 </div>
@@ -313,9 +330,7 @@ export default function AgendaBookViewer({ agendaId }: AgendaBookViewerProps) {
       </div>
 
       {/* Main Content - File Viewer */}
-      <div className="flex-1 flex flex-col">
-        {renderFileViewer()}
-      </div>
+      <div className="flex-1 flex flex-col">{renderFileViewer()}</div>
     </div>
   );
 }

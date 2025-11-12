@@ -42,18 +42,18 @@ export function useMemoDetail(id: string | number) {
       try {
         setLoading(true);
         setError(null);
-        
+
         console.log(`Fetching memo with ID: ${id}`);
         const response = await fetch(`/api/memos/${id}`);
-        
+
         console.log('Response status:', response.status);
-        
+
         if (!response.ok) {
           const errorData = await response.json();
           console.error('API Error:', errorData);
           throw new Error(errorData.error || `Failed to fetch memo: ${response.status}`);
         }
-        
+
         const memoData = await response.json();
         console.log('Fetched memo data:', memoData);
         setMemo(memoData);

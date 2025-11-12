@@ -1,17 +1,17 @@
-"use client";
-import Image from "next/image";
-import React, { useState } from "react";
-import { Dropdown } from "../ui/dropdown/Dropdown";
-import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+'use client';
+import Image from 'next/image';
+import React, { useState } from 'react';
+import { Dropdown } from '../ui/dropdown/Dropdown';
+import { DropdownItem } from '../ui/dropdown/DropdownItem';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function UserDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  const isLoading = status === "loading";
+  const isLoading = status === 'loading';
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();
@@ -25,18 +25,18 @@ export default function UserDropdown() {
   const handleSignOut = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     try {
-      await signOut({ 
+      await signOut({
         redirect: false,
-        callbackUrl: "/signin"
+        callbackUrl: '/signin',
       });
       closeDropdown();
       // Redirect to signin page after sign out
-      router.push("/signin");
+      router.push('/signin');
       router.refresh(); // Refresh to clear any cached session data
     } catch (error) {
-      console.error("Sign out error:", error);
+      console.error('Sign out error:', error);
     }
   };
 
@@ -60,9 +60,9 @@ export default function UserDropdown() {
   const user = session.user;
 
   return (
-    <div className="relative"> 
+    <div className="relative">
       <button
-        onClick={toggleDropdown} 
+        onClick={toggleDropdown}
         className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle"
         aria-label="User menu"
         aria-expanded={isOpen}
@@ -84,7 +84,7 @@ export default function UserDropdown() {
 
         <svg
           className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
+            isOpen ? 'rotate-180' : ''
           }`}
           width="18"
           height="20"
@@ -198,7 +198,7 @@ export default function UserDropdown() {
             </DropdownItem>
           </li>
         </ul>
-        
+
         {/* Sign Out Button */}
         <button
           onClick={handleSignOut}

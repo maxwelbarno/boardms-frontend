@@ -1,19 +1,14 @@
 // app/components/meetings/MeetingCalendar.tsx - FIXED VERSION
-"use client";
-import React, { useState, useRef, useEffect } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import {
-  EventInput,
-  DateSelectArg,
-  EventClickArg,
-  EventContentArg,
-} from "@fullcalendar/core";
-import { useModal } from "@/hooks/useModal";
+'use client';
+import React, { useState, useRef, useEffect } from 'react';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import { EventInput, DateSelectArg, EventClickArg, EventContentArg } from '@fullcalendar/core';
+import { useModal } from '@/hooks/useModal';
 import { useCategories } from '@/hooks/useCategories';
-import { Modal } from "@/components/ui/modal";
+import { Modal } from '@/components/ui/modal';
 
 interface CalendarEvent extends EventInput {
   extendedProps: {
@@ -45,30 +40,35 @@ interface Category {
 
 const Calendar: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
-  const [eventTitle, setEventTitle] = useState("");
-  const [eventType, setEventType] = useState("");
-  const [eventLocation, setEventLocation] = useState("");
-  const [eventStartDate, setEventStartDate] = useState("");
-  const [eventStartTime, setEventStartTime] = useState("");
-  const [eventEndDate, setEventEndDate] = useState("");
-  const [eventEndTime, setEventEndTime] = useState("");
-  const [eventDescription, setEventDescription] = useState("");
-  const [eventChair, setEventChair] = useState("");
-  const [eventCommittee, setEventCommittee] = useState("");
-  const [eventColour, setEventColour] = useState("#3B82F6");
+  const [eventTitle, setEventTitle] = useState('');
+  const [eventType, setEventType] = useState('');
+  const [eventLocation, setEventLocation] = useState('');
+  const [eventStartDate, setEventStartDate] = useState('');
+  const [eventStartTime, setEventStartTime] = useState('');
+  const [eventEndDate, setEventEndDate] = useState('');
+  const [eventEndTime, setEventEndTime] = useState('');
+  const [eventDescription, setEventDescription] = useState('');
+  const [eventChair, setEventChair] = useState('');
+  const [eventCommittee, setEventCommittee] = useState('');
+  const [eventColour, setEventColour] = useState('#3B82F6');
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>([]);
-  const [participantSearch, setParticipantSearch] = useState("");
-  
+  const [participantSearch, setParticipantSearch] = useState('');
+
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   // const [meetingTypes, setMeetingTypes] = useState<Category[]>([]);
   // const [locations, setLocations] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const calendarRef = useRef<FullCalendar>(null);
   const { isOpen, openModal, closeModal } = useModal();
-  const { categories, meetingTypes, locations, loading: categoriesLoading, refetch } = useCategories();
-
+  const {
+    categories,
+    meetingTypes,
+    locations,
+    loading: categoriesLoading,
+    refetch,
+  } = useCategories();
 
   // Fetch data on component mount
   useEffect(() => {
@@ -78,11 +78,7 @@ const Calendar: React.FC = () => {
   const fetchInitialData = async () => {
     try {
       setLoading(true);
-      await Promise.all([
-        fetchMeetings(),
-        fetchUsers(),
-        fetchMeetings()
-      ]);
+      await Promise.all([fetchMeetings(), fetchUsers(), fetchMeetings()]);
     } catch (error) {
       console.error('Error fetching initial data:', error);
     } finally {
@@ -94,7 +90,7 @@ const Calendar: React.FC = () => {
     try {
       const response = await fetch('/api/users?role=all');
       const result = await response.json();
-      
+
       if (response.ok && Array.isArray(result)) {
         setUsers(result);
       } else {
@@ -114,7 +110,7 @@ const Calendar: React.FC = () => {
 
   //     if (response.ok && Array.isArray(result)) {
   //       // Fixed: Filter for meeting types (adjust based on your actual category types)
-  //       const filtered = result.filter((cat: Category) => 
+  //       const filtered = result.filter((cat: Category) =>
   //         cat.type === 'meeting' || cat.type === 'meeting_type' || cat.type === 'meeting_status'
   //       );
   //       console.log('Meeting types loaded:', filtered);
@@ -153,12 +149,12 @@ const Calendar: React.FC = () => {
     try {
       const response = await fetch('/api/meetings');
       const result = await response.json();
-      
+
       console.log('Meetings API raw response:', result);
-      
+
       if (response.ok && Array.isArray(result)) {
         console.log(`Processing ${result.length} meetings`);
-        
+
         const calendarEvents = result.map((meeting: any) => {
           console.log('Processing meeting:', meeting);
           return {
@@ -175,11 +171,11 @@ const Calendar: React.FC = () => {
               status: meeting.status,
               description: meeting.description,
               participants: meeting.participants || [],
-              colour: meeting.colour || '#3B82F6'
-            }
+              colour: meeting.colour || '#3B82F6',
+            },
           };
         });
-        
+
         console.log('Calendar events:', calendarEvents);
         setEvents(calendarEvents);
       } else {
@@ -194,38 +190,42 @@ const Calendar: React.FC = () => {
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
     resetModalFields();
-    
+
     const startDate = new Date(selectInfo.startStr);
-    const endDate = selectInfo.endStr ? new Date(selectInfo.endStr) : new Date(startDate.getTime() + 60 * 60 * 1000); // Default 1 hour
-    
+    const endDate = selectInfo.endStr
+      ? new Date(selectInfo.endStr)
+      : new Date(startDate.getTime() + 60 * 60 * 1000); // Default 1 hour
+
     // Set date and time separately for form inputs
     setEventStartDate(startDate.toISOString().split('T')[0]);
     setEventStartTime(startDate.toTimeString().slice(0, 5));
     setEventEndDate(endDate.toISOString().split('T')[0]);
     setEventEndTime(endDate.toTimeString().slice(0, 5));
-    
+
     openModal();
   };
 
   const handleEventClick = (clickInfo: EventClickArg) => {
     const event = clickInfo.event;
     const startDate = event.start ? new Date(event.start) : new Date();
-    const endDate = event.end ? new Date(event.end) : new Date(startDate.getTime() + 60 * 60 * 1000);
-    
+    const endDate = event.end
+      ? new Date(event.end)
+      : new Date(startDate.getTime() + 60 * 60 * 1000);
+
     setSelectedEvent(event as unknown as CalendarEvent);
     setEventTitle(event.title);
     setEventType(event.extendedProps.type);
     setEventLocation(event.extendedProps.location);
-    setEventDescription(event.extendedProps.description || "");
+    setEventDescription(event.extendedProps.description || '');
     setEventChair(event.extendedProps.chair_id);
-    setEventCommittee(event.extendedProps.committee || "");
+    setEventCommittee(event.extendedProps.committee || '');
     setEventColour(event.extendedProps.colour || '#3B82F6');
-    setEventStartDate(startDate.toISOString().split("T")[0]);
+    setEventStartDate(startDate.toISOString().split('T')[0]);
     setEventStartTime(startDate.toTimeString().slice(0, 5));
-    setEventEndDate(endDate.toISOString().split("T")[0]);
+    setEventEndDate(endDate.toISOString().split('T')[0]);
     setEventEndTime(endDate.toTimeString().slice(0, 5));
     setSelectedParticipants(event.extendedProps.participants || []);
-    
+
     openModal();
   };
 
@@ -233,14 +233,14 @@ const Calendar: React.FC = () => {
   const handleMeetingTypeChange = (typeName: string) => {
     setEventType(typeName);
 
-    const category = categories.find(cat => cat.name === typeName);
+    const category = categories.find((cat) => cat.name === typeName);
     if (category && category.colour) {
       setEventColour(category.colour);
     }
 
     if (typeName.toLowerCase().includes('cabinet')) {
       // Cabinet meetings: President as chair, Deputy President as committee
-      const president = users.find(u => u.role.toLowerCase() === 'president');
+      const president = users.find((u) => u.role.toLowerCase() === 'president');
       if (president) setEventChair(president.id);
 
       setEventCommittee('Deputy President');
@@ -250,8 +250,12 @@ const Calendar: React.FC = () => {
     }
   };
 
-
-  const calculateDuration = (startDate: string, startTime: string, endDate: string, endTime: string): number => {
+  const calculateDuration = (
+    startDate: string,
+    startTime: string,
+    endDate: string,
+    endTime: string,
+  ): number => {
     const start = new Date(`${startDate}T${startTime}`);
     const end = new Date(`${endDate}T${endTime}`);
     const durationMs = end.getTime() - start.getTime();
@@ -260,14 +264,21 @@ const Calendar: React.FC = () => {
   };
 
   const handleAddOrUpdateEvent = async () => {
-    if (!eventTitle || !eventType || !eventStartDate || !eventStartTime || !eventLocation || !eventChair) {
+    if (
+      !eventTitle ||
+      !eventType ||
+      !eventStartDate ||
+      !eventStartTime ||
+      !eventLocation ||
+      !eventChair
+    ) {
       alert('Please fill in all required fields');
       return;
     }
 
     // Calculate duration in hours
     const duration = calculateDuration(eventStartDate, eventStartTime, eventEndDate, eventEndTime);
-    
+
     const meetingData = {
       name: eventTitle,
       type: eventType,
@@ -279,7 +290,7 @@ const Calendar: React.FC = () => {
       colour: eventColour,
       committee: eventCommittee,
       participants: selectedParticipants,
-      ...(selectedEvent && { id: selectedEvent.id })
+      ...(selectedEvent && { id: selectedEvent.id }),
     };
 
     console.log('Saving meeting:', meetingData);
@@ -287,7 +298,7 @@ const Calendar: React.FC = () => {
     try {
       const url = selectedEvent ? `/api/meetings/${selectedEvent.id}` : '/api/meetings';
       const method = selectedEvent ? 'PUT' : 'POST';
-      
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -313,36 +324,35 @@ const Calendar: React.FC = () => {
   };
 
   const resetModalFields = () => {
-    setEventTitle("");
-    setEventType("");
-    setEventLocation("");
-    setEventStartDate("");
-    setEventStartTime("");
-    setEventEndDate("");
-    setEventEndTime("");
-    setEventDescription("");
-    setEventChair("");
-    setEventCommittee("");
-    setEventColour("#3B82F6");
+    setEventTitle('');
+    setEventType('');
+    setEventLocation('');
+    setEventStartDate('');
+    setEventStartTime('');
+    setEventEndDate('');
+    setEventEndTime('');
+    setEventDescription('');
+    setEventChair('');
+    setEventCommittee('');
+    setEventColour('#3B82F6');
     setSelectedParticipants([]);
-    setParticipantSearch("");
+    setParticipantSearch('');
     setSelectedEvent(null);
   };
 
   const toggleParticipant = (userId: string) => {
-    setSelectedParticipants(prev =>
-      prev.includes(userId)
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
+    setSelectedParticipants((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId],
     );
   };
 
   // Filter users based on search
-  const filteredUsers = Array.isArray(users) 
-    ? users.filter(user => 
-        user.name.toLowerCase().includes(participantSearch.toLowerCase()) ||
-        user.role.toLowerCase().includes(participantSearch.toLowerCase()) ||
-        (user.ministry && user.ministry.toLowerCase().includes(participantSearch.toLowerCase()))
+  const filteredUsers = Array.isArray(users)
+    ? users.filter(
+        (user) =>
+          user.name.toLowerCase().includes(participantSearch.toLowerCase()) ||
+          user.role.toLowerCase().includes(participantSearch.toLowerCase()) ||
+          (user.ministry && user.ministry.toLowerCase().includes(participantSearch.toLowerCase())),
       )
     : [];
 
@@ -361,24 +371,22 @@ const Calendar: React.FC = () => {
     <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Meeting Calendar
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Meeting Calendar</h2>
           <div className="text-sm text-gray-600 dark:text-gray-400">
             {events.length} {events.length === 1 ? 'event' : 'events'} scheduled
           </div>
         </div>
       </div>
-      
+
       <div className="custom-calendar">
         <FullCalendar
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="dayGridMonth"
           headerToolbar={{
-            left: "prev,next addEventButton",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
+            left: 'prev,next addEventButton',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay',
           }}
           events={events}
           selectable={true}
@@ -387,7 +395,7 @@ const Calendar: React.FC = () => {
           eventContent={renderEventContent}
           customButtons={{
             addEventButton: {
-              text: "Schedule Meeting +",
+              text: 'Schedule Meeting +',
               click: openModal,
             },
           }}
@@ -403,10 +411,12 @@ const Calendar: React.FC = () => {
         <div className="flex flex-col">
           <div className="mb-6">
             <h5 className="mb-2 font-semibold text-gray-800 modal-title text-theme-xl dark:text-white/90 lg:text-2xl">
-              {selectedEvent ? "Edit Meeting" : "Schedule Meeting"}
+              {selectedEvent ? 'Edit Meeting' : 'Schedule Meeting'}
             </h5>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {selectedEvent ? "Update meeting details" : "Schedule a new cabinet or committee meeting"}
+              {selectedEvent
+                ? 'Update meeting details'
+                : 'Schedule a new cabinet or committee meeting'}
             </p>
           </div>
 
@@ -476,9 +486,7 @@ const Calendar: React.FC = () => {
                     onChange={(e) => setEventColour(e.target.value)}
                     className="w-12 h-12 rounded-lg border border-gray-300 cursor-pointer dark:border-gray-600"
                   />
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {eventColour}
-                  </span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{eventColour}</span>
                 </div>
               </div>
 
@@ -547,11 +555,12 @@ const Calendar: React.FC = () => {
                   required
                 >
                   <option value="">Select Chair Person</option>
-                  {Array.isArray(users) && users.map(user => (
-                    <option key={user.id} value={user.id}>
-                      {user.name} - {user.role}
-                    </option>
-                  ))}
+                  {Array.isArray(users) &&
+                    users.map((user) => (
+                      <option key={user.id} value={user.id}>
+                        {user.name} - {user.role}
+                      </option>
+                    ))}
                 </select>
               </div>
 
@@ -588,7 +597,7 @@ const Calendar: React.FC = () => {
                 <label className="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Participants ({selectedParticipants.length} selected)
                 </label>
-                
+
                 {/* Search Input */}
                 <div className="mb-4">
                   <input
@@ -602,8 +611,11 @@ const Calendar: React.FC = () => {
 
                 <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg dark:border-gray-700 p-4">
                   {filteredUsers.length > 0 ? (
-                    filteredUsers.map(user => (
-                      <div key={user.id} className="flex items-center p-3 border-b border-gray-100 dark:border-gray-800 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-900/50 rounded-lg">
+                    filteredUsers.map((user) => (
+                      <div
+                        key={user.id}
+                        className="flex items-center p-3 border-b border-gray-100 dark:border-gray-800 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-900/50 rounded-lg"
+                      >
                         <input
                           type="checkbox"
                           id={`user-${user.id}`}
@@ -611,21 +623,27 @@ const Calendar: React.FC = () => {
                           onChange={() => toggleParticipant(user.id)}
                           className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300 dark:border-gray-600"
                         />
-                        <label 
+                        <label
                           htmlFor={`user-${user.id}`}
                           className="ml-3 text-sm text-gray-700 dark:text-gray-300 flex-1 cursor-pointer"
                         >
                           <div className="font-medium">{user.name}</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user.role}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                            {user.role}
+                          </div>
                           {user.ministry && (
-                            <div className="text-xs text-gray-400 dark:text-gray-500">{user.ministry}</div>
+                            <div className="text-xs text-gray-400 dark:text-gray-500">
+                              {user.ministry}
+                            </div>
                           )}
                         </label>
                       </div>
                     ))
                   ) : (
                     <div className="text-center py-4 text-gray-500 dark:text-gray-400">
-                      {participantSearch ? 'No users found matching your search' : 'No users available'}
+                      {participantSearch
+                        ? 'No users found matching your search'
+                        : 'No users available'}
                     </div>
                   )}
                 </div>
@@ -646,7 +664,7 @@ const Calendar: React.FC = () => {
               type="button"
               className="btn btn-success btn-update-event flex w-full justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 sm:w-auto"
             >
-              {selectedEvent ? "Update Meeting" : "Schedule Meeting"}
+              {selectedEvent ? 'Update Meeting' : 'Schedule Meeting'}
             </button>
           </div>
         </div>
@@ -656,15 +674,16 @@ const Calendar: React.FC = () => {
 };
 
 const renderEventContent = (eventInfo: EventContentArg) => {
-  const eventColor = eventInfo.event.backgroundColor || eventInfo.event.extendedProps.colour || '#3B82F6';
-  
+  const eventColor =
+    eventInfo.event.backgroundColor || eventInfo.event.extendedProps.colour || '#3B82F6';
+
   return (
-    <div 
+    <div
       className="event-fc-color fc-event-main p-2 rounded-sm border-l-4"
-      style={{ 
+      style={{
         backgroundColor: eventColor + '20',
         borderLeftColor: eventColor,
-        borderColor: eventColor
+        borderColor: eventColor,
       }}
     >
       <div className="fc-event-time text-xs font-bold mb-1" style={{ color: eventColor }}>

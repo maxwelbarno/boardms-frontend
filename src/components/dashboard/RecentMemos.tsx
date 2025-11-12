@@ -1,52 +1,52 @@
 // app/components/dashboard/RecentMemos.tsx
-"use client";
-import React from "react";
-import Link from "next/link";
+'use client';
+import React from 'react';
+import Link from 'next/link';
 
 const recentMemos = [
   {
-    id: "MEM-001",
-    title: "Infrastructure Development Proposal",
-    ministry: "Ministry of Transport",
-    status: "Under Review",
-    statusColor: "blue",
-    date: "2024-01-15",
-    assignedTo: "Infrastructure Committee",
+    id: 'MEM-001',
+    title: 'Infrastructure Development Proposal',
+    ministry: 'Ministry of Transport',
+    status: 'Under Review',
+    statusColor: 'blue',
+    date: '2024-01-15',
+    assignedTo: 'Infrastructure Committee',
   },
   {
-    id: "MEM-002",
-    title: "Healthcare Funding Allocation",
-    ministry: "Ministry of Health",
-    status: "Approved",
-    statusColor: "green",
-    date: "2024-01-14",
-    assignedTo: "Social Services Committee",
+    id: 'MEM-002',
+    title: 'Healthcare Funding Allocation',
+    ministry: 'Ministry of Health',
+    status: 'Approved',
+    statusColor: 'green',
+    date: '2024-01-14',
+    assignedTo: 'Social Services Committee',
   },
   {
-    id: "MEM-003",
-    title: "Education Policy Reform",
-    ministry: "Ministry of Education",
-    status: "Pending",
-    statusColor: "yellow",
-    date: "2024-01-13",
-    assignedTo: "Social Services Committee",
+    id: 'MEM-003',
+    title: 'Education Policy Reform',
+    ministry: 'Ministry of Education',
+    status: 'Pending',
+    statusColor: 'yellow',
+    date: '2024-01-13',
+    assignedTo: 'Social Services Committee',
   },
   {
-    id: "MEM-004",
-    title: "Energy Sector Investment",
-    ministry: "Ministry of Energy",
-    status: "Revisions Required",
-    statusColor: "red",
-    date: "2024-01-12",
-    assignedTo: "Infrastructure Committee",
+    id: 'MEM-004',
+    title: 'Energy Sector Investment',
+    ministry: 'Ministry of Energy',
+    status: 'Revisions Required',
+    statusColor: 'red',
+    date: '2024-01-12',
+    assignedTo: 'Infrastructure Committee',
   },
 ];
 
 const statusColors: { [key: string]: string } = {
-  blue: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-  green: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-  yellow: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-  red: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+  blue: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  green: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  yellow: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  red: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
 };
 
 export default function RecentMemos() {

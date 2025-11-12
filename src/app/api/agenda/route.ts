@@ -4,19 +4,19 @@ import { query } from '@/lib/db';
 export async function POST(request: NextRequest) {
   try {
     const agendaData = await request.json();
-    
+
     console.log('📝 Creating new agenda item - Received data:', agendaData);
 
     // Validate required fields
     if (!agendaData.name || !agendaData.meeting_id) {
       console.error('❌ Missing required fields:', agendaData);
       return NextResponse.json(
-        { 
+        {
           error: 'Missing required fields',
           details: 'name and meeting_id are required',
-          received: agendaData
+          received: agendaData,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
       ministry_id: agendaData.ministry_id || null,
       cabinet_approval_required: agendaData.cabinet_approval_required || false,
       memo_id: agendaData.memo_id || null,
-      created_by: agendaData.created_by || null
+      created_by: agendaData.created_by || null,
     };
 
     console.log('🔄 Inserting agenda with data:', insertData);
@@ -65,8 +65,8 @@ export async function POST(request: NextRequest) {
         insertData.ministry_id,
         insertData.cabinet_approval_required,
         insertData.memo_id,
-        insertData.created_by
-      ]
+        insertData.created_by,
+      ],
     );
 
     if (result.rows.length === 0) {
@@ -78,18 +78,17 @@ export async function POST(request: NextRequest) {
     console.log('✅ Agenda item created successfully:', newAgenda);
 
     return NextResponse.json(newAgenda);
-
   } catch (error: any) {
     console.error('❌ Error creating agenda item:', error);
-    
+
     // Provide detailed error information
     const errorResponse = {
       error: 'Failed to create agenda item',
       details: error.message,
       code: error.code,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
+
     return NextResponse.json(errorResponse, { status: 500 });
   }
 }
@@ -100,10 +99,7 @@ export async function GET(request: NextRequest) {
     const meetingId = searchParams.get('meetingId');
 
     if (!meetingId) {
-      return NextResponse.json(
-        { error: 'meetingId parameter is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'meetingId parameter is required' }, { status: 400 });
     }
 
     const agendaResult = await query(
@@ -127,22 +123,18 @@ export async function GET(request: NextRequest) {
       WHERE a.meeting_id = $1
       ORDER BY a.sort_order ASC
       `,
-      [meetingId]
+      [meetingId],
     );
 
     // Ensure descriptions are returned as plain text
-    const agendaItems = agendaResult.rows.map(item => ({
+    const agendaItems = agendaResult.rows.map((item) => ({
       ...item,
-      description: item.description 
+      description: item.description,
     }));
 
     return NextResponse.json(agendaItems);
-
   } catch (error) {
     console.error('❌ Error fetching agenda items:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch agenda items' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch agenda items' }, { status: 500 });
   }
 }

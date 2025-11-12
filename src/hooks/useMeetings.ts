@@ -44,21 +44,21 @@ export function useMeetings(options: UseMeetingsOptions = {}) {
     try {
       setLoading(true);
       setError(null);
-      
+
       const params = new URLSearchParams();
       if (date) params.append('date', date);
       if (committee) params.append('committee', committee);
       if (type) params.append('type', type);
-      
+
       const url = `/api/meetings?${params.toString()}`;
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch meetings: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       if (Array.isArray(data)) {
         setMeetings(data);
       } else {
@@ -78,15 +78,11 @@ export function useMeetings(options: UseMeetingsOptions = {}) {
   };
 
   // Helper methods
-  const upcomingMeetings = meetings.filter(meeting => 
-    new Date(meeting.start_at) >= new Date()
-  );
-  
-  const pastMeetings = meetings.filter(meeting => 
-    new Date(meeting.start_at) < new Date()
-  );
-  
-  const todayMeetings = meetings.filter(meeting => {
+  const upcomingMeetings = meetings.filter((meeting) => new Date(meeting.start_at) >= new Date());
+
+  const pastMeetings = meetings.filter((meeting) => new Date(meeting.start_at) < new Date());
+
+  const todayMeetings = meetings.filter((meeting) => {
     const meetingDate = new Date(meeting.start_at);
     const today = new Date();
     return meetingDate.toDateString() === today.toDateString();
@@ -100,6 +96,6 @@ export function useMeetings(options: UseMeetingsOptions = {}) {
     loading,
     error,
     refetch,
-    fetchMeetings
+    fetchMeetings,
   };
 }

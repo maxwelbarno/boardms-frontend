@@ -1,5 +1,5 @@
 // app/components/meetings/ColourPicker.tsx
-"use client";
+'use client';
 import React from 'react';
 
 const presetColours = [
@@ -26,7 +26,7 @@ export default function ColourPicker({ selectedColour, onColourChange }: ColourP
       <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">
         Meeting Colour
       </label>
-      
+
       <div className="flex items-center gap-3 mb-3">
         <input
           type="color"
@@ -38,9 +38,7 @@ export default function ColourPicker({ selectedColour, onColourChange }: ColourP
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300 block">
             Selected Colour
           </span>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            {selectedColour}
-          </span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">{selectedColour}</span>
         </div>
       </div>
 
@@ -55,8 +53,8 @@ export default function ColourPicker({ selectedColour, onColourChange }: ColourP
               type="button"
               onClick={() => onColourChange(colour)}
               className={`w-8 h-8 rounded-full border-2 transition-all ${
-                selectedColour === colour 
-                  ? 'border-gray-800 dark:border-white scale-110' 
+                selectedColour === colour
+                  ? 'border-gray-800 dark:border-white scale-110'
                   : 'border-gray-300 dark:border-gray-600 hover:scale-105'
               }`}
               style={{ backgroundColor: colour }}

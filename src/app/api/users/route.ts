@@ -7,16 +7,17 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const role = searchParams.get('role');
-    
+
     let whereClause = '';
     const params: any[] = [];
-    
+
     if (role && role !== 'all') {
       whereClause = 'WHERE u.role = $1';
       params.push(role);
     }
 
-    const users = await query(`
+    const users = await query(
+      `
       SELECT 
         u.id,
         u.image,  
@@ -45,15 +46,14 @@ export async function GET(request: NextRequest) {
           ELSE 8
         END,
         u.name
-    `, params);
+    `,
+      params,
+    );
 
     return NextResponse.json(users.rows);
   } catch (error) {
     console.error('Error fetching users:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch users' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
   }
 }
 
@@ -62,27 +62,31 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, image, email, password, role, status, phone, ministry_id } = body;
 
-    console.log('Creating user with data:', { name, image, email, role, status, phone, ministry_id });
+    console.log('Creating user with data:', {
+      name,
+      image,
+      email,
+      role,
+      status,
+      phone,
+      ministry_id,
+    });
 
     // Validate required fields
     if (!name || !email || !password || !role) {
       return NextResponse.json(
         { error: 'Name, email, password, and role are required' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Check if user already exists
-    const existingUser = await query(
-      'SELECT id FROM users WHERE email = $1',
-      [email.toLowerCase()]
-    );
+    const existingUser = await query('SELECT id FROM users WHERE email = $1', [
+      email.toLowerCase(),
+    ]);
 
     if (existingUser.rows.length > 0) {
-      return NextResponse.json(
-        { error: 'User with this email already exists' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'User with this email already exists' }, { status: 400 });
     }
 
     // Hash password
@@ -93,25 +97,30 @@ export async function POST(request: NextRequest) {
       `INSERT INTO users (name, image, email, password, role, status, phone) 
        VALUES ($1, $2, $3, $4, $5, $6) 
        RETURNING id, name, email, role, status, phone, created_at`,
-      [name, image || null, email.toLowerCase(), hashedPassword, role, status || 'active', phone || null]
+      [
+        name,
+        image || null,
+        email.toLowerCase(),
+        hashedPassword,
+        role,
+        status || 'active',
+        phone || null,
+      ],
     );
 
     const newUser = result.rows[0];
 
     // If ministry_id is provided, update the ministry
     if (ministry_id) {
-      await query(
-        'UPDATE ministries SET cabinet_secretary = $1 WHERE id = $2',
-        [newUser.id, ministry_id]
-      );
+      await query('UPDATE ministries SET cabinet_secretary = $1 WHERE id = $2', [
+        newUser.id,
+        ministry_id,
+      ]);
     }
 
     return NextResponse.json(newUser, { status: 201 });
   } catch (error) {
     console.error('Error creating user:', error);
-    return NextResponse.json(
-      { error: 'Failed to create user' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
   }
 }

@@ -1,13 +1,13 @@
-"use client";
-import React from "react";
+'use client';
+import React from 'react';
 
 const workflowData = [
-  { stage: "Draft", count: 8, color: "bg-gray-400" },
-  { stage: "Submitted", count: 12, color: "bg-blue-500" },
-  { stage: "Committee Review", count: 6, color: "bg-yellow-500" },
-  { stage: "Cabinet Review", count: 4, color: "bg-purple-500" },
-  { stage: "Approved", count: 23, color: "bg-green-500" },
-  { stage: "Implemented", count: 18, color: "bg-teal-500" },
+  { stage: 'Draft', count: 8, color: 'bg-gray-400' },
+  { stage: 'Submitted', count: 12, color: 'bg-blue-500' },
+  { stage: 'Committee Review', count: 6, color: 'bg-yellow-500' },
+  { stage: 'Cabinet Review', count: 4, color: 'bg-purple-500' },
+  { stage: 'Approved', count: 23, color: 'bg-green-500' },
+  { stage: 'Implemented', count: 18, color: 'bg-teal-500' },
 ];
 
 export default function WorkflowChart() {
@@ -18,7 +18,7 @@ export default function WorkflowChart() {
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
         Workflow Overview
       </h3>
-      
+
       {/* Bar Chart */}
       <div className="space-y-4">
         {workflowData.map((item, index) => {

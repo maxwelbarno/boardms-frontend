@@ -4,11 +4,11 @@ import pool from '@/lib/db';
 // Helper function to format UTC offset
 function formatUtcOffset(offset: any): string {
   if (!offset) return '+00:00';
-  
+
   try {
     const offsetStr = offset.toString();
     const matches = offsetStr.match(/([+-]?)(\d+):(\d+):(\d+)/);
-    
+
     if (matches) {
       const sign = matches[1] || '+';
       const hours = matches[2].padStart(2, '0');
@@ -18,7 +18,7 @@ function formatUtcOffset(offset: any): string {
   } catch (error) {
     console.error('Error formatting UTC offset:', error);
   }
-  
+
   return '+00:00';
 }
 
@@ -30,7 +30,7 @@ export async function GET() {
     const result = await pool.query('SELECT * FROM system_settings ORDER BY id DESC LIMIT 1');
 
     let settings = {};
-    
+
     if (result.rows.length === 0) {
       console.log('⚠️ No settings found, returning defaults');
       // Return default structure
@@ -40,7 +40,7 @@ export async function GET() {
         version: '1.0.0',
         timezone: 'Africa/Nairobi',
         date_format: 'DD/MM/YYYY',
-        language: 'en'
+        language: 'en',
       };
     } else {
       settings = result.rows[0];
@@ -63,10 +63,10 @@ export async function GET() {
         LIMIT 200
       `);
 
-      timezones = tzResult.rows.map(tz => ({
+      timezones = tzResult.rows.map((tz) => ({
         name: tz.name || '',
         abbrev: tz.abbrev || '',
-        utc_offset: formatUtcOffset(tz.utc_offset)
+        utc_offset: formatUtcOffset(tz.utc_offset),
       }));
 
       console.log(`🌍 Loaded ${timezones.length} timezones`);
@@ -87,7 +87,7 @@ export async function GET() {
       timezone: 'Africa/Nairobi',
       date_format: 'DD/MM/YYYY',
       language: 'en',
-      timezones: []
+      timezones: [],
     });
   }
 }
@@ -96,13 +96,15 @@ export async function PUT(request: NextRequest) {
   try {
     const settings = await request.json();
     console.log('📝 Received settings update:', settings);
-    
+
     if (!settings.id) {
       return NextResponse.json({ error: 'Settings ID is required' }, { status: 400 });
     }
 
     // Check if record exists
-    const checkResult = await pool.query('SELECT id FROM system_settings WHERE id = $1', [settings.id]);
+    const checkResult = await pool.query('SELECT id FROM system_settings WHERE id = $1', [
+      settings.id,
+    ]);
     if (checkResult.rows.length === 0) {
       return NextResponse.json({ error: 'Settings not found' }, { status: 404 });
     }
@@ -132,7 +134,7 @@ export async function PUT(request: NextRequest) {
       WHERE id = $20
       RETURNING *
     `;
-    
+
     const values = [
       settings.name || 'E-Cabinet System',
       settings.timezone || 'Africa/Nairobi',
@@ -153,22 +155,21 @@ export async function PUT(request: NextRequest) {
       settings.smtp_port || 587,
       settings.file_storage || 'local',
       settings.max_file_size || 10,
-      settings.id
+      settings.id,
     ];
 
     const result = await pool.query(query, values);
 
     console.log('✅ Update successful:', result.rows[0]);
     return NextResponse.json(result.rows[0]);
-    
   } catch (error) {
     console.error('❌ PUT Database error details:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to update settings in database',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      }, 
-      { status: 500 }
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
     );
   }
 }

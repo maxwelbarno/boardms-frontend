@@ -1,36 +1,36 @@
-"use client";
-import React from "react";
-import { useModal } from "../../hooks/useModal";
-import { Modal } from "../ui/modal";
-import Button from "../ui/button/Button";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
-import { useSession } from "next-auth/react";
+'use client';
+import React from 'react';
+import { useModal } from '../../hooks/useModal';
+import { Modal } from '../ui/modal';
+import Button from '../ui/button/Button';
+import Input from '../form/input/InputField';
+import Label from '../form/Label';
+import { useSession } from 'next-auth/react';
 
 export default function UserAddressCard() {
   const { isOpen, openModal, closeModal } = useModal();
   const { data: session, status } = useSession();
-  
-  const isLoading = status === "loading";
+
+  const isLoading = status === 'loading';
   const user = session?.user;
 
   const handleSave = () => {
     // Handle save logic here - you can integrate with your API
-    console.log("Saving address changes...");
+    console.log('Saving address changes...');
     closeModal();
   };
 
   // Default Kenyan government address data
   const defaultAddress = {
-    country: "Kenya",
-    county: "Nairobi County",
-    constituency: "Nairobi Constituency",
-    postalCode: "00100",
-    building: "Harambee House",
-    street: "Harambee Avenue",
-    officeLocation: "Floor 4, Room 402",
-    phone: "+254-20-2227411",
-    employeeId: user?.id ? `GOK-${user.id.toString().padStart(6, '0')}` : "GOK-000000"
+    country: 'Kenya',
+    county: 'Nairobi County',
+    constituency: 'Nairobi Constituency',
+    postalCode: '00100',
+    building: 'Harambee House',
+    street: 'Harambee Avenue',
+    officeLocation: 'Floor 4, Room 402',
+    phone: '+254-20-2227411',
+    employeeId: user?.id ? `GOK-${user.id.toString().padStart(6, '0')}` : 'GOK-000000',
   };
 
   // Loading state
@@ -40,7 +40,7 @@ export default function UserAddressCard() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex-1">
             <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-6 animate-pulse"></div>
-            
+
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
               {[...Array(4)].map((_, i) => (
                 <div key={i}>
@@ -172,7 +172,6 @@ export default function UserAddressCard() {
           </div>
           <form className="flex flex-col">
             <div className="px-2 pb-3 overflow-y-auto custom-scrollbar max-h-[500px]">
-              
               {/* Office Location Section */}
               <div className="mb-8">
                 <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
@@ -181,8 +180,8 @@ export default function UserAddressCard() {
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div>
                     <Label>Country</Label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       defaultValue={defaultAddress.country}
                       placeholder="Country"
                     />
@@ -190,17 +189,13 @@ export default function UserAddressCard() {
 
                   <div>
                     <Label>County</Label>
-                    <Input 
-                      type="text" 
-                      defaultValue={defaultAddress.county}
-                      placeholder="County"
-                    />
+                    <Input type="text" defaultValue={defaultAddress.county} placeholder="County" />
                   </div>
 
                   <div>
                     <Label>Constituency</Label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       defaultValue={defaultAddress.constituency}
                       placeholder="Constituency"
                     />
@@ -208,8 +203,8 @@ export default function UserAddressCard() {
 
                   <div>
                     <Label>Postal Code</Label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       defaultValue={defaultAddress.postalCode}
                       placeholder="Postal Code"
                     />
@@ -217,8 +212,8 @@ export default function UserAddressCard() {
 
                   <div className="lg:col-span-2">
                     <Label>Street Address</Label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       defaultValue={defaultAddress.street}
                       placeholder="Street Address"
                     />
@@ -226,8 +221,8 @@ export default function UserAddressCard() {
 
                   <div>
                     <Label>Building Name</Label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       defaultValue={defaultAddress.building}
                       placeholder="Building Name"
                     />
@@ -235,8 +230,8 @@ export default function UserAddressCard() {
 
                   <div>
                     <Label>Office Location</Label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       defaultValue={defaultAddress.officeLocation}
                       placeholder="Floor, Room Number"
                     />
@@ -252,8 +247,8 @@ export default function UserAddressCard() {
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div>
                     <Label>Office Phone</Label>
-                    <Input 
-                      type="tel" 
+                    <Input
+                      type="tel"
                       defaultValue={defaultAddress.phone}
                       placeholder="+254-XX-XXXXXXX"
                     />
@@ -261,24 +256,18 @@ export default function UserAddressCard() {
 
                   <div>
                     <Label>Extension</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="Extension number"
-                    />
+                    <Input type="text" placeholder="Extension number" />
                   </div>
 
                   <div>
                     <Label>Emergency Contact</Label>
-                    <Input 
-                      type="tel" 
-                      placeholder="Emergency phone number"
-                    />
+                    <Input type="tel" placeholder="Emergency phone number" />
                   </div>
 
                   <div>
                     <Label>Government Email</Label>
-                    <Input 
-                      type="email" 
+                    <Input
+                      type="email"
                       defaultValue={user?.email || ''}
                       placeholder="name@ministry.go.ke"
                       disabled
@@ -295,8 +284,8 @@ export default function UserAddressCard() {
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div>
                     <Label>Employee ID</Label>
-                    <Input 
-                      type="text" 
+                    <Input
+                      type="text"
                       defaultValue={defaultAddress.employeeId}
                       placeholder="GOK-XXXXXX"
                       disabled
@@ -305,26 +294,17 @@ export default function UserAddressCard() {
 
                   <div>
                     <Label>KRA PIN</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="A012345678B"
-                    />
+                    <Input type="text" placeholder="A012345678B" />
                   </div>
 
                   <div>
                     <Label>National ID Number</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="12345678"
-                    />
+                    <Input type="text" placeholder="12345678" />
                   </div>
 
                   <div>
                     <Label>Passport Number</Label>
-                    <Input 
-                      type="text" 
-                      placeholder="A12345678"
-                    />
+                    <Input type="text" placeholder="A12345678" />
                   </div>
                 </div>
               </div>
@@ -332,7 +312,7 @@ export default function UserAddressCard() {
               {/* Additional Notes */}
               <div className="mt-6">
                 <Label>Additional Notes</Label>
-                <textarea 
+                <textarea
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white resize-none"
                   rows={3}
                   placeholder="Any additional address or contact information..."

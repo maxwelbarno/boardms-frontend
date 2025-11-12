@@ -1,7 +1,7 @@
 // app/components/meetings/MeetingMinutesDetail.tsx
-"use client";
-import React from "react";
-import { useRouter } from "next/navigation";
+'use client';
+import React from 'react';
+import { useRouter } from 'next/navigation';
 
 interface MeetingMinutesDetailProps {
   minuteId: string;
@@ -9,61 +9,57 @@ interface MeetingMinutesDetailProps {
 
 export default function MeetingMinutesDetail({ minuteId }: MeetingMinutesDetailProps) {
   const router = useRouter();
-  
+
   // Mock data - in real app, fetch by minuteId
   const minute = {
     id: minuteId,
-    meetingTitle: "Infrastructure Committee Meeting",
-    committee: "Infrastructure & Energy",
-    date: "2024-01-11",
-    status: "approved",
+    meetingTitle: 'Infrastructure Committee Meeting',
+    committee: 'Infrastructure & Energy',
+    date: '2024-01-11',
+    status: 'approved',
     attendees: [
-      "H.E. Rigathi Gachagua (Chair)",
-      "Hon. Kipchumba Murkomen",
-      "Hon. Davis Chirchir", 
+      'H.E. Rigathi Gachagua (Chair)',
+      'Hon. Kipchumba Murkomen',
+      'Hon. Davis Chirchir',
       "Hon. Njuguna Ndung'u",
-      "Hon. Musalia Mudavadi"
+      'Hon. Musalia Mudavadi',
     ],
     decisions: [
       {
-        id: "1",
-        title: "Infrastructure Development Proposal",
-        decision: "APPROVED",
-        decisionDetails: "Approved with modifications to implementation timeline",
+        id: '1',
+        title: 'Infrastructure Development Proposal',
+        decision: 'APPROVED',
+        decisionDetails: 'Approved with modifications to implementation timeline',
         actionItems: [
-          "Ministry of Transport to commence implementation by Feb 1st",
-          "Treasury to release first tranche of funds by Jan 20th"
-        ]
+          'Ministry of Transport to commence implementation by Feb 1st',
+          'Treasury to release first tranche of funds by Jan 20th',
+        ],
       },
       {
-        id: "2",
-        title: "Energy Sector Reforms",
-        decision: "APPROVED",
-        decisionDetails: "Approved the proposed energy sector reforms",
+        id: '2',
+        title: 'Energy Sector Reforms',
+        decision: 'APPROVED',
+        decisionDetails: 'Approved the proposed energy sector reforms',
         actionItems: [
-          "Ministry of Energy to draft implementation framework",
-          "Public consultation to be completed by March 31st"
-        ]
-      }
+          'Ministry of Energy to draft implementation framework',
+          'Public consultation to be completed by March 31st',
+        ],
+      },
     ],
-    nextMeeting: "2024-02-15",
-    preparedBy: "Cabinet Secretariat",
-    documents: [
-      "meeting-minutes.pdf",
-      "attendance-sheet.docx",
-      "presentation-slides.pptx"
-    ]
+    nextMeeting: '2024-02-15',
+    preparedBy: 'Cabinet Secretariat',
+    documents: ['meeting-minutes.pdf', 'attendance-sheet.docx', 'presentation-slides.pptx'],
   };
 
   const generateActionLetters = () => {
-    alert("Action letters generated for all approved decisions!");
+    alert('Action letters generated for all approved decisions!');
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <button 
+          <button
             onClick={() => router.back()}
             className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 mb-4"
           >
@@ -76,7 +72,7 @@ export default function MeetingMinutesDetail({ minuteId }: MeetingMinutesDetailP
             {minute.committee} • {new Date(minute.date).toLocaleDateString()}
           </p>
         </div>
-        <button 
+        <button
           onClick={generateActionLetters}
           className="rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600"
         >
@@ -97,15 +93,23 @@ export default function MeetingMinutesDetail({ minuteId }: MeetingMinutesDetailP
               <div className="space-y-4">
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Date</h3>
-                  <p className="text-sm text-gray-900 dark:text-white">{new Date(minute.date).toLocaleDateString()}</p>
+                  <p className="text-sm text-gray-900 dark:text-white">
+                    {new Date(minute.date).toLocaleDateString()}
+                  </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Prepared By</h3>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Prepared By
+                  </h3>
                   <p className="text-sm text-gray-900 dark:text-white">{minute.preparedBy}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Next Meeting</h3>
-                  <p className="text-sm text-gray-900 dark:text-white">{new Date(minute.nextMeeting).toLocaleDateString()}</p>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Next Meeting
+                  </h3>
+                  <p className="text-sm text-gray-900 dark:text-white">
+                    {new Date(minute.nextMeeting).toLocaleDateString()}
+                  </p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Status</h3>
@@ -114,12 +118,17 @@ export default function MeetingMinutesDetail({ minuteId }: MeetingMinutesDetailP
                   </span>
                 </div>
               </div>
-              
+
               <div className="mt-6">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Attendees</h3>
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Attendees
+                </h3>
                 <div className="space-y-2">
                   {minute.attendees.map((attendee, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+                    >
                       <div className="h-2 w-2 rounded-full bg-green-500"></div>
                       {attendee}
                     </div>
@@ -129,7 +138,9 @@ export default function MeetingMinutesDetail({ minuteId }: MeetingMinutesDetailP
 
               {minute.documents.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Documents</h3>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    Documents
+                  </h3>
                   <div className="space-y-2">
                     {minute.documents.map((doc, index) => (
                       <div key={index} className="flex items-center justify-between text-sm">
@@ -155,7 +166,10 @@ export default function MeetingMinutesDetail({ minuteId }: MeetingMinutesDetailP
             <div className="p-6">
               <div className="space-y-6">
                 {minute.decisions.map((decision) => (
-                  <div key={decision.id} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0 dark:border-gray-700">
+                  <div
+                    key={decision.id}
+                    className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0 dark:border-gray-700"
+                  >
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                         {decision.title}
@@ -164,18 +178,21 @@ export default function MeetingMinutesDetail({ minuteId }: MeetingMinutesDetailP
                         {decision.decision}
                       </span>
                     </div>
-                    
+
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                       {decision.decisionDetails}
                     </p>
-                    
+
                     <div>
                       <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Action Items:
                       </h4>
                       <ul className="space-y-2">
                         {decision.actionItems.map((action, index) => (
-                          <li key={index} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                          <li
+                            key={index}
+                            className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400"
+                          >
                             <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gray-400"></span>
                             {action}
                           </li>

@@ -24,16 +24,16 @@ export function useCategories(type?: string) {
     try {
       setLoading(true);
       setError(null);
-      
+
       const url = type ? `/api/categories?type=${type}` : '/api/categories';
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch categories: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       if (Array.isArray(data)) {
         setCategories(data);
       } else {
@@ -53,9 +53,9 @@ export function useCategories(type?: string) {
   };
 
   // Helper methods for common category types
-  const meetingTypes = categories.filter(cat => cat.type === 'meeting_status');
-  const locations = categories.filter(cat => cat.type === 'location');
-  const meetingStatuses = categories.filter(cat => cat.type === 'meeting_status');
+  const meetingTypes = categories.filter((cat) => cat.type === 'meeting_status');
+  const locations = categories.filter((cat) => cat.type === 'location');
+  const meetingStatuses = categories.filter((cat) => cat.type === 'meeting_status');
 
   return {
     categories,
@@ -64,6 +64,6 @@ export function useCategories(type?: string) {
     meetingStatuses,
     loading,
     error,
-    refetch
+    refetch,
   };
 }

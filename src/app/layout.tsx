@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import SessionProvider from '@/components/providers/SessionProvider';
 
 const outfit = Outfit({
-  subsets: ["latin"],
+  subsets: ['latin'],
 });
 
 export default function RootLayout({

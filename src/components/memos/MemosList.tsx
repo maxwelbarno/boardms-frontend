@@ -1,8 +1,8 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
-import CreateMemoSlideOver from "./CreateMemoSlideOver";
+'use client';
+import React, { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import CreateMemoSlideOver from './CreateMemoSlideOver';
 
 interface Memo {
   id: string;
@@ -19,28 +19,29 @@ interface Memo {
 }
 
 const statusColors = {
-  draft: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
-  submitted: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-  under_review: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-  approved: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-  rejected: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+  draft: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+  submitted: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  under_review: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  approved: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  rejected: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
 };
 
 const priorityColors = {
-  low: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300",
-  medium: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-  high: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300",
-  urgent: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
+  low: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+  medium: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  high: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
+  urgent: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
 };
 
 export default function MemosList() {
   const [memos, setMemos] = useState<Memo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState('all');
   const { data: session } = useSession();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const handleMemoCreated = (newMemo: Memo) => {setMemos((prevMemos) => [newMemo, ...prevMemos]);
-  }
+  const handleMemoCreated = (newMemo: Memo) => {
+    setMemos((prevMemos) => [newMemo, ...prevMemos]);
+  };
 
   useEffect(() => {
     fetchMyMemos();
@@ -61,27 +62,25 @@ export default function MemosList() {
     }
   };
 
-  const filteredMemos = memos.filter(memo => 
-    filter === "all" || memo.status === filter
-  );
+  const filteredMemos = memos.filter((memo) => filter === 'all' || memo.status === filter);
 
   const getStatusLabel = (status: string) => {
     const labels: { [key: string]: string } = {
-      draft: "Draft",
-      submitted: "Submitted",
-      under_review: "Under Review",
-      approved: "Approved",
-      rejected: "Rejected"
+      draft: 'Draft',
+      submitted: 'Submitted',
+      under_review: 'Under Review',
+      approved: 'Approved',
+      rejected: 'Rejected',
     };
     return labels[status] || status;
   };
 
   const getPriorityLabel = (priority: string) => {
     const labels: { [key: string]: string } = {
-      low: "Low",
-      medium: "Medium",
-      high: "High",
-      urgent: "Urgent"
+      low: 'Low',
+      medium: 'Medium',
+      high: 'High',
+      urgent: 'Urgent',
     };
     return labels[priority] || priority;
   };
@@ -108,7 +107,7 @@ export default function MemosList() {
               My Memos ({filteredMemos.length})
             </h3>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <select
               value={filter}
@@ -130,14 +129,28 @@ export default function MemosList() {
       <div className="p-6">
         {filteredMemos.length === 0 ? (
           <div className="text-center py-12">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No memos found</h3>
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+              No memos found
+            </h3>
             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {filter === "all" ? "Get started by creating your first memo." : `No memos with ${filter} status.`}
+              {filter === 'all'
+                ? 'Get started by creating your first memo.'
+                : `No memos with ${filter} status.`}
             </p>
-            {filter === "all" && (
+            {filter === 'all' && (
               <div className="mt-6">
                 {/* <Link
                   href="/memos/create"
@@ -146,11 +159,11 @@ export default function MemosList() {
                   Create New Memo
                 </Link> */}
                 {/* Slide-over Component */}
-                      <CreateMemoSlideOver
-                        isOpen={isCreateModalOpen}
-                        onClose={() => setIsCreateModalOpen(false)}
-                        onMemoCreated={handleMemoCreated}
-                      />
+                <CreateMemoSlideOver
+                  isOpen={isCreateModalOpen}
+                  onClose={() => setIsCreateModalOpen(false)}
+                  onMemoCreated={handleMemoCreated}
+                />
               </div>
             )}
           </div>
@@ -171,10 +184,14 @@ export default function MemosList() {
                         {memo.summary}
                       </p>
                       <div className="mt-3 flex items-center gap-4">
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[memo.status]}`}>
+                        <span
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[memo.status]}`}
+                        >
                           {getStatusLabel(memo.status)}
                         </span>
-                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${priorityColors[memo.priority]}`}>
+                        <span
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${priorityColors[memo.priority]}`}
+                        >
                           {getPriorityLabel(memo.priority)}
                         </span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">

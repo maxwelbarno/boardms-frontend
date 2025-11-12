@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     // ✅ FIX: Await params for Next.js 13+
     const { id } = await params;
     const meetingId = id;
-    
+
     console.log('🔍 Fetching meeting with ID:', meetingId);
 
     // Fetch meeting details
@@ -42,15 +39,12 @@ export async function GET(
       LEFT JOIN users approved_by_user ON m.approved_by = approved_by_user.id
       WHERE m.id = $1
       `,
-      [meetingId]
+      [meetingId],
     );
 
     if (meetingResult.rows.length === 0) {
       console.log('❌ Meeting not found:', meetingId);
-      return NextResponse.json(
-        { error: 'Meeting not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Meeting not found' }, { status: 404 });
     }
 
     const meeting = meetingResult.rows[0];
@@ -68,14 +62,14 @@ export async function GET(
       JOIN users u ON mp.user_id = u.id
       WHERE mp.meeting_id = $1
       `,
-      [meetingId]
+      [meetingId],
     );
 
     console.log('✅ Participants fetched:', participantsResult.rows.length);
 
     // ✅ Fetch agenda items
     console.log('🔄 Starting agenda fetch...');
-    
+
     try {
       // Full agenda query
       const agendaResult = await query(
@@ -100,7 +94,7 @@ export async function GET(
         WHERE a.meeting_id = $1
         ORDER BY a.sort_order ASC
         `,
-        [meetingId]
+        [meetingId],
       );
 
       console.log(`📋 Found ${agendaResult.rows.length} agenda items for meeting ${meetingId}`);
@@ -109,7 +103,7 @@ export async function GET(
       const agendaWithDocuments = await Promise.all(
         agendaResult.rows.map(async (agendaItem) => {
           console.log('🔄 Fetching documents for agenda:', agendaItem.id);
-          
+
           const documentsResult = await query(
             `
             SELECT 
@@ -126,23 +120,26 @@ export async function GET(
             WHERE agenda_id = $1
             ORDER BY uploaded_at DESC
             `,
-            [agendaItem.id]
+            [agendaItem.id],
           );
 
-          console.log(`📄 Found ${documentsResult.rows.length} documents for agenda ${agendaItem.id}`);
+          console.log(
+            `📄 Found ${documentsResult.rows.length} documents for agenda ${agendaItem.id}`,
+          );
 
           return {
             ...agendaItem,
-            documents: documentsResult.rows.map(doc => ({
-              ...doc,
-              // Use file_url directly - no fallback to file_path
-              file_url: doc.file_url
-            })) || [],
+            documents:
+              documentsResult.rows.map((doc) => ({
+                ...doc,
+                // Use file_url directly - no fallback to file_path
+                file_url: doc.file_url,
+              })) || [],
             ministry: agendaItem.ministry_name
               ? { id: agendaItem.ministry_id, name: agendaItem.ministry_name }
               : null,
           };
-        })
+        }),
       );
 
       console.log('✅ All agenda documents fetched successfully');
@@ -162,64 +159,61 @@ export async function GET(
       });
 
       return NextResponse.json(meetingData);
-
     } catch (agendaError) {
       console.error('❌ Error in agenda section:', agendaError);
-      
+
       // Return meeting data without agenda if agenda fails
       const meetingDataWithoutAgenda = {
         ...meeting,
         participants: participantsResult.rows || [],
         agenda: [], // Empty agenda array
       };
-      
+
       console.log('⚠️ Returning meeting without agenda due to error');
       return NextResponse.json(meetingDataWithoutAgenda);
     }
-
   } catch (error) {
     console.error('❌ Error fetching meeting:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to fetch meeting',
         details: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
+        stack: error instanceof Error ? error.stack : undefined,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = await params;
     const meetingId = id;
     const meetingData = await request.json();
-    
+
     console.log('📝 Updating meeting:', { id: meetingId, ...meetingData });
 
     // Validate required fields
-    if (!meetingData.name || !meetingData.type || !meetingData.start_at || !meetingData.location || !meetingData.status) {
+    if (
+      !meetingData.name ||
+      !meetingData.type ||
+      !meetingData.start_at ||
+      !meetingData.location ||
+      !meetingData.status
+    ) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, type, start_at, location, status' },
-        { status: 400 }
+        {
+          error: 'Missing required fields: name, type, start_at, location, status',
+        },
+        { status: 400 },
       );
     }
 
     // Check if meeting exists
-    const existingMeeting = await query(
-      'SELECT id FROM meetings WHERE id = $1',
-      [meetingId]
-    );
+    const existingMeeting = await query('SELECT id FROM meetings WHERE id = $1', [meetingId]);
 
     if (existingMeeting.rows.length === 0) {
-      return NextResponse.json(
-        { error: 'Meeting not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Meeting not found' }, { status: 404 });
     }
 
     // Update the meeting
@@ -253,8 +247,8 @@ export async function PUT(
         meetingData.description || '',
         meetingData.colour || '#3b82f6',
         meetingData.approved_by || null,
-        meetingId
-      ]
+        meetingId,
+      ],
     );
 
     if (result.rows.length === 0) {
@@ -265,56 +259,39 @@ export async function PUT(
     console.log('✅ Meeting updated successfully:', updatedMeeting.id);
 
     return NextResponse.json(updatedMeeting);
-
   } catch (error) {
     console.error('❌ Error updating meeting:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to update meeting',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      }, 
-      { status: 500 }
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
     );
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = await params;
     const meetingId = id;
-    
+
     console.log('🗑️ Deleting meeting:', meetingId);
 
     // Check if meeting exists
-    const existingMeeting = await query(
-      'SELECT id FROM meetings WHERE id = $1',
-      [meetingId]
-    );
+    const existingMeeting = await query('SELECT id FROM meetings WHERE id = $1', [meetingId]);
 
     if (existingMeeting.rows.length === 0) {
-      return NextResponse.json(
-        { error: 'Meeting not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Meeting not found' }, { status: 404 });
     }
 
     // Delete meeting
-    await query(
-      'DELETE FROM meetings WHERE id = $1',
-      [meetingId]
-    );
+    await query('DELETE FROM meetings WHERE id = $1', [meetingId]);
 
     console.log('✅ Meeting deleted successfully:', meetingId);
     return NextResponse.json({ success: true });
-
   } catch (error) {
     console.error('❌ Error deleting meeting:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete meeting' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to delete meeting' }, { status: 500 });
   }
 }

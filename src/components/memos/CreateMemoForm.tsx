@@ -1,9 +1,9 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import Input from "@/components/form/input/InputField";
-import Label from "@/components/form/Label";
-import Button from "@/components/ui/button/Button";
-import { DocumentIcon, UploadIcon } from "@/icons";
+'use client';
+import React, { useState, useEffect } from 'react';
+import Input from '@/components/form/input/InputField';
+import Label from '@/components/form/Label';
+import Button from '@/components/ui/button/Button';
+import { DocumentIcon, UploadIcon } from '@/icons';
 
 // Types for our entities
 interface Ministry {
@@ -26,29 +26,29 @@ interface Agency {
 }
 
 const memoTypes = [
-  { id: "cabinet", name: "Cabinet Committee" },
-  { id: "interior", name: "Interior Memo" },
-  { id: "treasury", name: "Treasury Memo" },
-  { id: "presidential", name: "Presidential Memo" },
+  { id: 'cabinet', name: 'Cabinet Committee' },
+  { id: 'interior', name: 'Interior Memo' },
+  { id: 'treasury', name: 'Treasury Memo' },
+  { id: 'presidential', name: 'Presidential Memo' },
 ];
 
 const priorityLevels = [
-  { id: "low", name: "Low" },
-  { id: "medium", name: "Medium" },
-  { id: "high", name: "High" },
-  { id: "urgent", name: "Urgent" },
+  { id: 'low', name: 'Low' },
+  { id: 'medium', name: 'Medium' },
+  { id: 'high', name: 'High' },
+  { id: 'urgent', name: 'Urgent' },
 ];
 
 export default function CreateMemoForm() {
   const [formData, setFormData] = useState({
-    name: "",
-    summary: "",
-    body: "",
-    memo_type: "cabinet",
-    priority: "medium",
-    ministry_id: "",
-    state_department_id: "",
-    agency_id: "",
+    name: '',
+    summary: '',
+    body: '',
+    memo_type: 'cabinet',
+    priority: 'medium',
+    ministry_id: '',
+    state_department_id: '',
+    agency_id: '',
     attachments: [] as File[],
   });
 
@@ -68,13 +68,13 @@ export default function CreateMemoForm() {
         const response = await fetch('/api/ministries');
         if (response.ok) {
           const ministries = await response.json();
-          setEntities(prev => ({ ...prev, ministries }));
+          setEntities((prev) => ({ ...prev, ministries }));
         }
       } catch (error) {
         console.error('Error fetching ministries:', error);
       }
     };
-    
+
     fetchMinistries();
   }, []);
 
@@ -83,23 +83,25 @@ export default function CreateMemoForm() {
     const fetchStateDepartments = async () => {
       if (formData.ministry_id) {
         try {
-          const response = await fetch(`/api/state_departments?ministry_id=${formData.ministry_id}`);
+          const response = await fetch(
+            `/api/state_departments?ministry_id=${formData.ministry_id}`,
+          );
           if (response.ok) {
             const stateDepartments = await response.json();
-            setEntities(prev => ({ ...prev, stateDepartments }));
-            
+            setEntities((prev) => ({ ...prev, stateDepartments }));
+
             // Reset dependent fields
-            setFormData(prev => ({
-              ...prev, 
-              state_department_id: "",
-              agency_id: ""
+            setFormData((prev) => ({
+              ...prev,
+              state_department_id: '',
+              agency_id: '',
             }));
           }
         } catch (error) {
           console.error('Error fetching state departments:', error);
         }
       } else {
-        setEntities(prev => ({ ...prev, stateDepartments: [] }));
+        setEntities((prev) => ({ ...prev, stateDepartments: [] }));
       }
     };
 
@@ -111,35 +113,39 @@ export default function CreateMemoForm() {
     const fetchAgencies = async () => {
       if (formData.state_department_id) {
         try {
-          const response = await fetch(`/api/agencies?state_department_id=${formData.state_department_id}`);
+          const response = await fetch(
+            `/api/agencies?state_department_id=${formData.state_department_id}`,
+          );
           if (response.ok) {
             const agencies = await response.json();
-            setEntities(prev => ({ ...prev, agencies }));
-            
+            setEntities((prev) => ({ ...prev, agencies }));
+
             // Reset agency field
-            setFormData(prev => ({ ...prev, agency_id: "" }));
+            setFormData((prev) => ({ ...prev, agency_id: '' }));
           }
         } catch (error) {
           console.error('Error fetching agencies:', error);
         }
       } else {
-        setEntities(prev => ({ ...prev, agencies: [] }));
+        setEntities((prev) => ({ ...prev, agencies: [] }));
       }
     };
 
     fetchAgencies();
   }, [formData.state_department_id]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        attachments: Array.from(e.target.files || [])
+        attachments: Array.from(e.target.files || []),
       }));
     }
   };
@@ -147,7 +153,7 @@ export default function CreateMemoForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       // Prepare form data for submission
       const submissionData = {
@@ -159,11 +165,11 @@ export default function CreateMemoForm() {
         ministry_id: formData.ministry_id,
         state_department_id: formData.state_department_id || null,
         agency_id: formData.agency_id || null,
-        status: "draft", // or "submitted" based on your workflow
+        status: 'draft', // or "submitted" based on your workflow
       };
 
-      console.log("Submitting memo data:", submissionData);
-      
+      console.log('Submitting memo data:', submissionData);
+
       const response = await fetch('/api/memos', {
         method: 'POST',
         headers: {
@@ -173,7 +179,7 @@ export default function CreateMemoForm() {
       });
 
       const result = await response.json();
-      
+
       if (!response.ok) {
         // Capture detailed error information
         setDebugInfo({
@@ -196,29 +202,28 @@ export default function CreateMemoForm() {
         timestamp: new Date().toISOString(),
       });
 
-      console.log("Memo created successfully:", result);
-      
+      console.log('Memo created successfully:', result);
+
       // TODO: Handle file uploads here if needed
       if (formData.attachments.length > 0) {
-        console.log("Files to upload:", formData.attachments);
+        console.log('Files to upload:', formData.attachments);
         // Implement file upload logic here
       }
 
       // Reset form
       setFormData({
-        name: "",
-        summary: "",
-        body: "",
-        memo_type: "cabinet",
-        priority: "medium",
-        ministry_id: "",
-        state_department_id: "",
-        agency_id: "",
+        name: '',
+        summary: '',
+        body: '',
+        memo_type: 'cabinet',
+        priority: 'medium',
+        ministry_id: '',
+        state_department_id: '',
+        agency_id: '',
         attachments: [],
       });
-
     } catch (error) {
-      console.error("Error creating memo:", error);
+      console.error('Error creating memo:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -227,11 +232,9 @@ export default function CreateMemoForm() {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700">
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Memo Details
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Memo Details</h2>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         {/* Basic Information */}
         <div>
@@ -294,7 +297,7 @@ export default function CreateMemoForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               required
             >
-              {memoTypes.map(type => (
+              {memoTypes.map((type) => (
                 <option key={type.id} value={type.id}>
                   {type.name}
                 </option>
@@ -311,7 +314,7 @@ export default function CreateMemoForm() {
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
-              {priorityLevels.map(level => (
+              {priorityLevels.map((level) => (
                 <option key={level.id} value={level.id}>
                   {level.name}
                 </option>
@@ -335,7 +338,7 @@ export default function CreateMemoForm() {
               required
             >
               <option value="">Select a ministry</option>
-              {entities.ministries.map(ministry => (
+              {entities.ministries.map((ministry) => (
                 <option key={ministry.id} value={ministry.id}>
                   {ministry.name} ({ministry.acronym})
                 </option>
@@ -354,7 +357,7 @@ export default function CreateMemoForm() {
               disabled={!formData.ministry_id}
             >
               <option value="">Select state department</option>
-              {entities.stateDepartments.map(dept => (
+              {entities.stateDepartments.map((dept) => (
                 <option key={dept.id} value={dept.id}>
                   {dept.name}
                 </option>
@@ -373,7 +376,7 @@ export default function CreateMemoForm() {
               disabled={!formData.state_department_id}
             >
               <option value="">Select agency</option>
-              {entities.agencies.map(agency => (
+              {entities.agencies.map((agency) => (
                 <option key={agency.id} value={agency.id}>
                   {agency.name}
                 </option>
@@ -417,34 +420,27 @@ export default function CreateMemoForm() {
 
         {/* Debug Information */}
         {debugInfo && (
-          <div className={`p-4 rounded-lg border ${
-            debugInfo.error 
-              ? 'bg-error-50 border-error-200 text-error-800' 
-              : 'bg-success-50 border-success-200 text-success-800'
-          }`}>
+          <div
+            className={`p-4 rounded-lg border ${
+              debugInfo.error
+                ? 'bg-error-50 border-error-200 text-error-800'
+                : 'bg-success-50 border-success-200 text-success-800'
+            }`}
+          >
             <h3 className="font-semibold mb-2">
               {debugInfo.error ? 'Submission Failed' : 'Submission Successful'}
             </h3>
-            <pre className="text-xs whitespace-pre-wrap">
-              {JSON.stringify(debugInfo, null, 2)}
-            </pre>
+            <pre className="text-xs whitespace-pre-wrap">{JSON.stringify(debugInfo, null, 2)}</pre>
           </div>
         )}
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => window.history.back()}
-          >
+          <Button type="button" variant="outline" onClick={() => window.history.back()}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Creating Memo..." : "Create Memo"}
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Creating Memo...' : 'Create Memo'}
           </Button>
         </div>
       </form>

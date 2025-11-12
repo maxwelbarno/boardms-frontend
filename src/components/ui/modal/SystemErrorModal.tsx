@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React from 'react';
 
 interface SystemErrorModalProps {
@@ -8,7 +8,12 @@ interface SystemErrorModalProps {
   onClose: () => void;
 }
 
-export default function SystemErrorModal({ isOpen, title, message, onClose }: SystemErrorModalProps) {
+export default function SystemErrorModal({
+  isOpen,
+  title,
+  message,
+  onClose,
+}: SystemErrorModalProps) {
   if (!isOpen) return null;
 
   return (
@@ -20,17 +25,13 @@ export default function SystemErrorModal({ isOpen, title, message, onClose }: Sy
               <span className="text-white text-sm">!</span>
             </div>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white ml-3">
-            {title}
-          </h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white ml-3">{title}</h3>
         </div>
-        
+
         <div className="mb-6">
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            {message}
-          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{message}</p>
         </div>
-        
+
         <div className="flex justify-end">
           <button
             onClick={onClose}

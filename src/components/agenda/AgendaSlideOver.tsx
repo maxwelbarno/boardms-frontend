@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Save, Loader2, Bug, Upload, File, Trash2, Eye } from 'lucide-react';
 
@@ -46,7 +46,7 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
     sort_order: 1,
     presenter_id: '',
     ministry_id: '',
-    cabinet_approval_required: false
+    cabinet_approval_required: false,
   });
   const [users, setUsers] = useState<User[]>([]);
   const [ministries, setMinistries] = useState<Ministry[]>([]);
@@ -65,31 +65,39 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-      setDebugInfo(prev => ({ ...prev, loading: true }));
-      
+      setDebugInfo((prev) => ({ ...prev, loading: true }));
+
       try {
         console.log('🔍 DEBUG: Starting data fetch for AgendaSlideOver');
-        
+
         const [usersResponse, ministriesResponse, categoriesResponse] = await Promise.all([
           fetch('/api/users'),
           fetch('/api/ministries'),
-          fetch('/api/categories?type=decision_status')
+          fetch('/api/categories?type=decision_status'),
         ]);
 
         console.log('🔍 DEBUG: API Responses:', {
           users: { status: usersResponse.status, ok: usersResponse.ok },
-          ministries: { status: ministriesResponse.status, ok: ministriesResponse.ok },
-          categories: { status: categoriesResponse.status, ok: categoriesResponse.ok }
+          ministries: {
+            status: ministriesResponse.status,
+            ok: ministriesResponse.ok,
+          },
+          categories: {
+            status: categoriesResponse.status,
+            ok: categoriesResponse.ok,
+          },
         });
 
         if (!usersResponse.ok) throw new Error(`Users API failed: ${usersResponse.status}`);
-        if (!ministriesResponse.ok) throw new Error(`Ministries API failed: ${ministriesResponse.status}`);
-        if (!categoriesResponse.ok) throw new Error(`Categories API failed: ${categoriesResponse.status}`);
+        if (!ministriesResponse.ok)
+          throw new Error(`Ministries API failed: ${ministriesResponse.status}`);
+        if (!categoriesResponse.ok)
+          throw new Error(`Categories API failed: ${categoriesResponse.status}`);
 
         const [usersData, ministriesData, categoriesData] = await Promise.all([
           usersResponse.json(),
           ministriesResponse.json(),
-          categoriesResponse.json()
+          categoriesResponse.json(),
         ]);
 
         // Fetch documents if editing existing agenda
@@ -110,14 +118,14 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
           ministriesCount: ministriesData.length,
           categoriesCount: categoriesData.length,
           documentsCount: documents.length,
-          categories: categoriesData
+          categories: categoriesData,
         });
 
         setUsers(usersData);
         setMinistries(ministriesData);
         setStatusOptions(categoriesData);
 
-        setDebugInfo(prev => ({
+        setDebugInfo((prev) => ({
           ...prev,
           dataLoaded: true,
           usersCount: usersData.length,
@@ -125,16 +133,15 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
           categoriesCount: categoriesData.length,
           documentsCount: documents.length,
           categories: categoriesData,
-          loading: false
+          loading: false,
         }));
-
       } catch (error) {
         console.error('❌ ERROR: Failed to fetch data:', error);
         setError('Failed to load form data. Please try again.');
-        setDebugInfo(prev => ({
+        setDebugInfo((prev) => ({
           ...prev,
           error: error instanceof Error ? error.message : String(error),
-          loading: false
+          loading: false,
         }));
       } finally {
         setIsLoading(false);
@@ -148,16 +155,16 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
 
   // Update form when agenda changes
   useEffect(() => {
-    console.log('🔍 DEBUG: Agenda prop changed:', { 
-      agenda, 
+    console.log('🔍 DEBUG: Agenda prop changed:', {
+      agenda,
       hasId: agenda?.id,
-      meetingId: agenda?.meeting_id 
+      meetingId: agenda?.meeting_id,
     });
 
     if (agenda) {
       // Handle description - convert from JSON if needed
       let description = agenda.description || '';
-      
+
       if (typeof description === 'string' && description.startsWith('{')) {
         try {
           const parsedDescription = JSON.parse(description);
@@ -175,20 +182,19 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
         sort_order: agenda.sort_order || 1,
         presenter_id: agenda.presenter_id || '',
         ministry_id: agenda.ministry_id || '',
-        cabinet_approval_required: agenda.cabinet_approval_required || false
+        cabinet_approval_required: agenda.cabinet_approval_required || false,
       };
 
       console.log('🔍 DEBUG: Setting form data for existing agenda:', newFormData);
       setFormData(newFormData);
 
-      setDebugInfo(prev => ({
+      setDebugInfo((prev) => ({
         ...prev,
         editingAgenda: true,
         agendaId: agenda.id,
         originalData: agenda,
-        formData: newFormData
+        formData: newFormData,
       }));
-
     } else {
       // For new agenda, get next sort order
       const getNextSortOrder = async () => {
@@ -196,33 +202,34 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
           try {
             console.log('🔍 DEBUG: Fetching next sort order for meeting:', agenda.meeting_id);
             const response = await fetch(`/api/agenda?meetingId=${agenda.meeting_id}`);
-            
-            console.log('🔍 DEBUG: Sort order response:', { 
-              status: response.status, 
-              ok: response.ok 
+
+            console.log('🔍 DEBUG: Sort order response:', {
+              status: response.status,
+              ok: response.ok,
             });
 
             if (response.ok) {
               const agendaItems = await response.json();
-              const maxSortOrder = agendaItems.length > 0 
-                ? Math.max(...agendaItems.map((item: any) => item.sort_order || 0))
-                : 0;
+              const maxSortOrder =
+                agendaItems.length > 0
+                  ? Math.max(...agendaItems.map((item: any) => item.sort_order || 0))
+                  : 0;
               const nextSortOrder = maxSortOrder + 1;
-              
+
               console.log('🔍 DEBUG: Calculated sort order:', {
                 agendaItemsCount: agendaItems.length,
                 maxSortOrder,
-                nextSortOrder
+                nextSortOrder,
               });
 
-              setFormData(prev => ({ ...prev, sort_order: nextSortOrder }));
+              setFormData((prev) => ({ ...prev, sort_order: nextSortOrder }));
             }
           } catch (error) {
             console.error('❌ ERROR: Failed to get next sort order:', error);
           }
         }
       };
-      
+
       const initialFormData = {
         name: '',
         description: '',
@@ -230,19 +237,19 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
         sort_order: 1,
         presenter_id: '',
         ministry_id: '',
-        cabinet_approval_required: false
+        cabinet_approval_required: false,
       };
 
       console.log('🔍 DEBUG: Setting initial form data for new agenda:', initialFormData);
       setFormData(initialFormData);
-      
+
       getNextSortOrder();
 
-      setDebugInfo(prev => ({
+      setDebugInfo((prev) => ({
         ...prev,
         editingAgenda: false,
         agendaId: null,
-        formData: initialFormData
+        formData: initialFormData,
       }));
     }
   }, [agenda]);
@@ -250,19 +257,23 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setDebugInfo(prev => ({ ...prev, lastOperation: 'submit', submitError: null }));
-    
+    setDebugInfo((prev) => ({
+      ...prev,
+      lastOperation: 'submit',
+      submitError: null,
+    }));
+
     if (!formData.name.trim()) {
       const errorMsg = 'Agenda item name is required';
       setError(errorMsg);
-      setDebugInfo(prev => ({ ...prev, validationError: errorMsg }));
+      setDebugInfo((prev) => ({ ...prev, validationError: errorMsg }));
       return;
     }
 
     if (!agenda?.meeting_id) {
       const errorMsg = 'Meeting ID is missing';
       setError(errorMsg);
-      setDebugInfo(prev => ({ ...prev, validationError: errorMsg }));
+      setDebugInfo((prev) => ({ ...prev, validationError: errorMsg }));
       return;
     }
 
@@ -273,7 +284,7 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
       const method = agenda?.id ? 'PUT' : 'POST';
 
       // Get presenter name from selected user for both fields
-      const selectedUser = users.find(user => user.id === formData.presenter_id);
+      const selectedUser = users.find((user) => user.id === formData.presenter_id);
       const presenter_id = formData.presenter_id || null;
 
       // Prepare data with both presenter_id and presenter_name for compatibility
@@ -289,25 +300,25 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
         ministry_id: formData.ministry_id || null,
         // Required fields for backend schema
         memo_id: null,
-        created_by: null
+        created_by: null,
       };
 
-      console.log('🔄 DEBUG: Saving agenda data:', { 
-        method, 
-        url, 
+      console.log('🔄 DEBUG: Saving agenda data:', {
+        method,
+        url,
         agendaId: agenda?.id,
         meetingId: agenda?.meeting_id,
-        submitData
+        submitData,
       });
 
-      setDebugInfo(prev => ({
+      setDebugInfo((prev) => ({
         ...prev,
         apiCall: {
           method,
           url,
           requestData: submitData,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       }));
 
       const response = await fetch(url, {
@@ -322,7 +333,7 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
         status: response.status,
         statusText: response.statusText,
         ok: response.ok,
-        url: response.url
+        url: response.url,
       });
 
       const responseText = await response.text();
@@ -333,41 +344,41 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
         try {
           errorData = responseText ? JSON.parse(responseText) : { error: 'Empty response body' };
         } catch {
-          errorData = { 
+          errorData = {
             error: `HTTP ${response.status}: ${response.statusText}`,
-            rawResponse: responseText.substring(0, 200) // Limit length for display
+            rawResponse: responseText.substring(0, 200), // Limit length for display
           };
         }
-        
+
         console.error('❌ DEBUG: API Error response:', errorData);
-        
-        setDebugInfo(prev => ({
+
+        setDebugInfo((prev) => ({
           ...prev,
           apiCall: {
             ...prev.apiCall,
             responseStatus: response.status,
             responseError: errorData,
-            responseText: responseText.substring(0, 500) // Limit length
-          }
+            responseText: responseText.substring(0, 500), // Limit length
+          },
         }));
 
         // Enhanced error message with more context
         let errorMessage = `Failed to ${agenda?.id ? 'update' : 'create'} agenda item`;
-        
+
         if (errorData.error && errorData.error !== 'Empty response body') {
           errorMessage += `: ${errorData.error}`;
         }
-        
+
         if (errorData.details) {
           errorMessage += ` (${errorData.details})`;
         }
-        
+
         if (response.status === 500) {
           errorMessage += ' - Server error occurred';
         }
-        
+
         errorMessage += ` [HTTP ${response.status}]`;
-        
+
         throw new Error(errorMessage);
       }
 
@@ -381,27 +392,27 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
 
       console.log('✅ DEBUG: Agenda saved successfully:', savedAgenda);
 
-      setDebugInfo(prev => ({
+      setDebugInfo((prev) => ({
         ...prev,
         apiCall: {
           ...prev.apiCall,
           responseStatus: response.status,
           responseData: savedAgenda,
-          success: true
-        }
+          success: true,
+        },
       }));
 
       onSave(savedAgenda);
       onClose();
-
     } catch (err) {
       console.error('❌ ERROR: Failed to save agenda:', err);
-      const errorMsg = err instanceof Error ? err.message : 'Failed to save agenda item. Please try again.';
+      const errorMsg =
+        err instanceof Error ? err.message : 'Failed to save agenda item. Please try again.';
       setError(errorMsg);
-      setDebugInfo(prev => ({ 
-        ...prev, 
+      setDebugInfo((prev) => ({
+        ...prev,
         submitError: errorMsg,
-        lastError: err 
+        lastError: err,
       }));
     } finally {
       setIsSaving(false);
@@ -410,19 +421,23 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
 
   const handleQuickAdd = async () => {
     setError(null);
-    setDebugInfo(prev => ({ ...prev, lastOperation: 'quickAdd', submitError: null }));
-    
+    setDebugInfo((prev) => ({
+      ...prev,
+      lastOperation: 'quickAdd',
+      submitError: null,
+    }));
+
     if (!formData.name.trim()) {
       const errorMsg = 'Agenda item name is required';
       setError(errorMsg);
-      setDebugInfo(prev => ({ ...prev, validationError: errorMsg }));
+      setDebugInfo((prev) => ({ ...prev, validationError: errorMsg }));
       return;
     }
 
     if (!agenda?.meeting_id) {
       const errorMsg = 'Meeting ID is missing';
       setError(errorMsg);
-      setDebugInfo(prev => ({ ...prev, validationError: errorMsg }));
+      setDebugInfo((prev) => ({ ...prev, validationError: errorMsg }));
       return;
     }
 
@@ -436,25 +451,25 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
         sort_order: parseInt(formData.sort_order.toString()),
         cabinet_approval_required: false,
         meeting_id: agenda.meeting_id,
-        presenter_id: null, 
+        presenter_id: null,
         ministry_id: null,
         memo_id: null,
-        created_by: null
+        created_by: null,
       };
 
-      console.log('🔄 DEBUG: Quick adding agenda:', { 
+      console.log('🔄 DEBUG: Quick adding agenda:', {
         meetingId: agenda.meeting_id,
-        submitData 
+        submitData,
       });
 
-      setDebugInfo(prev => ({
+      setDebugInfo((prev) => ({
         ...prev,
         apiCall: {
           method: 'POST',
           url: '/api/agenda',
           requestData: submitData,
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       }));
 
       const response = await fetch('/api/agenda', {
@@ -468,7 +483,7 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
       console.log('📨 DEBUG: Quick add API Response:', {
         status: response.status,
         statusText: response.statusText,
-        ok: response.ok
+        ok: response.ok,
       });
 
       const responseText = await response.text();
@@ -478,22 +493,28 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
         try {
           errorData = responseText ? JSON.parse(responseText) : { error: 'Empty response' };
         } catch {
-          errorData = { error: `HTTP ${response.status}: ${response.statusText}`, rawResponse: responseText };
+          errorData = {
+            error: `HTTP ${response.status}: ${response.statusText}`,
+            rawResponse: responseText,
+          };
         }
-        
+
         console.error('❌ DEBUG: Quick add API Error:', errorData);
-        
-        setDebugInfo(prev => ({
+
+        setDebugInfo((prev) => ({
           ...prev,
           apiCall: {
             ...prev.apiCall,
             responseStatus: response.status,
             responseError: errorData,
-            responseText
-          }
+            responseText,
+          },
         }));
 
-        const errorMessage = errorData.error || errorData.details || `Failed to create agenda item (HTTP ${response.status})`;
+        const errorMessage =
+          errorData.error ||
+          errorData.details ||
+          `Failed to create agenda item (HTTP ${response.status})`;
         throw new Error(errorMessage);
       }
 
@@ -507,27 +528,27 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
 
       console.log('✅ DEBUG: Agenda quick added successfully:', savedAgenda);
 
-      setDebugInfo(prev => ({
+      setDebugInfo((prev) => ({
         ...prev,
         apiCall: {
           ...prev.apiCall,
           responseStatus: response.status,
           responseData: savedAgenda,
-          success: true
-        }
+          success: true,
+        },
       }));
 
       onSave(savedAgenda);
       onClose();
-
     } catch (err) {
       console.error('❌ ERROR: Failed to quick add agenda:', err);
-      const errorMsg = err instanceof Error ? err.message : 'Failed to add agenda item. Please try again.';
+      const errorMsg =
+        err instanceof Error ? err.message : 'Failed to add agenda item. Please try again.';
       setError(errorMsg);
-      setDebugInfo(prev => ({ 
-        ...prev, 
+      setDebugInfo((prev) => ({
+        ...prev,
         submitError: errorMsg,
-        lastError: err 
+        lastError: err,
       }));
     } finally {
       setIsSaving(false);
@@ -535,62 +556,66 @@ const AgendaSlideOver: React.FC<AgendaSlideOverProps> = ({ agenda, isOpen, onClo
   };
 
   // Document Management Functions
-const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-  if (!agenda?.id || !event.target.files?.length) return;
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!agenda?.id || !event.target.files?.length) return;
 
-  const file = event.target.files[0];
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('agendaId', agenda.id);
-  formData.append('name', file.name);
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('agendaId', agenda.id);
+    formData.append('name', file.name);
 
-  try {
-    setIsUploading(true);
-    console.log('🔄 Uploading file:', {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      agendaId: agenda.id
-    });
-    
-    const response = await fetch('/api/agenda/documents', {
-      method: 'POST',
-      body: formData,
-    });
+    try {
+      setIsUploading(true);
+      console.log('🔄 Uploading file:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        agendaId: agenda.id,
+      });
 
-    const responseText = await response.text();
-    console.log('📨 Upload response:', {
-      status: response.status,
-      statusText: response.statusText,
-      responseText
-    });
+      const response = await fetch('/api/agenda/documents', {
+        method: 'POST',
+        body: formData,
+      });
 
-    if (response.ok) {
-      const newDoc = JSON.parse(responseText);
-      console.log('✅ File uploaded successfully:', newDoc);
-      
-      setDocuments(prev => [...prev, newDoc]);
-      event.target.value = '';
-      
-      alert('File uploaded successfully!');
-    } else {
-      let errorData;
-      try {
-        errorData = responseText ? JSON.parse(responseText) : { error: 'Empty response' };
-      } catch {
-        errorData = { error: `HTTP ${response.status}: ${response.statusText}` };
+      const responseText = await response.text();
+      console.log('📨 Upload response:', {
+        status: response.status,
+        statusText: response.statusText,
+        responseText,
+      });
+
+      if (response.ok) {
+        const newDoc = JSON.parse(responseText);
+        console.log('✅ File uploaded successfully:', newDoc);
+
+        setDocuments((prev) => [...prev, newDoc]);
+        event.target.value = '';
+
+        alert('File uploaded successfully!');
+      } else {
+        let errorData;
+        try {
+          errorData = responseText ? JSON.parse(responseText) : { error: 'Empty response' };
+        } catch {
+          errorData = {
+            error: `HTTP ${response.status}: ${response.statusText}`,
+          };
+        }
+
+        console.error('❌ Upload failed:', errorData);
+        alert(
+          `Upload failed: ${errorData.error}${errorData.details ? ` - ${errorData.details}` : ''}`,
+        );
       }
-      
-      console.error('❌ Upload failed:', errorData);
-      alert(`Upload failed: ${errorData.error}${errorData.details ? ` - ${errorData.details}` : ''}`);
+    } catch (error) {
+      console.error('❌ Error uploading file:', error);
+      alert('Failed to upload file. Please try again.');
+    } finally {
+      setIsUploading(false);
     }
-  } catch (error) {
-    console.error('❌ Error uploading file:', error);
-    alert('Failed to upload file. Please try again.');
-  } finally {
-    setIsUploading(false);
-  }
-};
+  };
 
   const handleDeleteDocument = async (documentId: string) => {
     if (!confirm('Are you sure you want to delete this document?')) return;
@@ -603,7 +628,7 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
 
       if (response.ok) {
         console.log('✅ Document deleted');
-        setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+        setDocuments((prev) => prev.filter((doc) => doc.id !== documentId));
         alert('Document deleted successfully!');
       } else {
         const error = await response.json();
@@ -628,23 +653,35 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     const { name, value, type } = e.target;
-    
-    const newValue = type === 'checkbox' ? (e.target as HTMLInputElement).checked : 
-                    type === 'number' ? parseInt(value) || 1 : 
-                    value;
 
-    console.log('🔍 DEBUG: Form field changed:', { name, value: newValue, type });
+    const newValue =
+      type === 'checkbox'
+        ? (e.target as HTMLInputElement).checked
+        : type === 'number'
+          ? parseInt(value) || 1
+          : value;
 
-    setFormData(prev => ({
+    console.log('🔍 DEBUG: Form field changed:', {
+      name,
+      value: newValue,
+      type,
+    });
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: newValue
+      [name]: newValue,
     }));
 
-    setDebugInfo(prev => ({
+    setDebugInfo((prev) => ({
       ...prev,
-      formChanges: [...(prev.formChanges || []), { field: name, value: newValue, timestamp: new Date().toISOString() }]
+      formChanges: [
+        ...(prev.formChanges || []),
+        { field: name, value: newValue, timestamp: new Date().toISOString() },
+      ],
     }));
   };
 
@@ -658,8 +695,11 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
   return (
     <div className="fixed inset-0 overflow-hidden z-50">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={onClose} />
-        
+        <div
+          className="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          onClick={onClose}
+        />
+
         <div className="fixed inset-y-0 right-0 pl-10 max-w-full flex">
           <div className="w-screen max-w-2xl">
             <div className="h-full flex flex-col bg-white dark:bg-gray-800 shadow-xl">
@@ -773,7 +813,7 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                             >
                               <option value="">Select Presenter</option>
-                              {users.map(user => (
+                              {users.map((user) => (
                                 <option key={user.id} value={user.id}>
                                   {user.name}
                                 </option>
@@ -796,7 +836,7 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                             >
                               <option value="">Select Ministry</option>
-                              {ministries.map(ministry => (
+                              {ministries.map((ministry) => (
                                 <option key={ministry.id} value={ministry.id}>
                                   {ministry.name}
                                 </option>
@@ -835,7 +875,7 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
                               <option value="in_progress">In Progress</option>
                               <option value="completed">Completed</option>
                               <option value="cancelled">Cancelled</option>
-                              {statusOptions.map(category => (
+                              {statusOptions.map((category) => (
                                 <option key={category.id} value={category.name.toLowerCase()}>
                                   {category.name}
                                 </option>
@@ -853,7 +893,10 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
                               onChange={handleChange}
                               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
-                            <label htmlFor="cabinet_approval" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            <label
+                              htmlFor="cabinet_approval"
+                              className="ml-2 block text-sm text-gray-700 dark:text-gray-300"
+                            >
                               Requires Cabinet Approval
                             </label>
                           </div>
@@ -866,7 +909,7 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
                           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                             Documents ({documents.length})
                           </h3>
-                          
+
                           {/* File Upload */}
                           <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -939,7 +982,9 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
                           ) : (
                             <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg dark:border-gray-600">
                               <File className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                              <p className="text-gray-500 dark:text-gray-400">No documents uploaded yet</p>
+                              <p className="text-gray-500 dark:text-gray-400">
+                                No documents uploaded yet
+                              </p>
                               <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
                                 Upload supporting documents for this agenda item
                               </p>
@@ -977,13 +1022,11 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
                       disabled={isSaving || !formData.name.trim()}
                       className="flex items-center px-4 py-2 text-sm font-medium text-green-700 bg-green-100 border border-green-300 rounded-md shadow-sm hover:bg-green-200 disabled:bg-gray-400 disabled:text-gray-700 disabled:cursor-not-allowed dark:bg-green-900 dark:text-green-300 dark:border-green-700 dark:hover:bg-green-800"
                     >
-                      {isSaving ? (
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      ) : null}
+                      {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                       {isSaving ? 'Adding...' : 'Quick Add'}
                     </button>
                   )}
-                  
+
                   <div className="flex justify-end space-x-3 flex-1">
                     <button
                       type="button"

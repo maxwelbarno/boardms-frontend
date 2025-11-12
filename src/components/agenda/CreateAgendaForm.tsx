@@ -1,15 +1,15 @@
 // app/components/agendas/CreateAgendaForm.tsx
-"use client";
-import React, { useState } from "react";
-import Input from "@/components/form/input/InputField";
-import Label from "@/components/form/Label";
-import Button from "@/components/ui/button/Button";
-import { useRouter } from "next/navigation";
+'use client';
+import React, { useState } from 'react';
+import Input from '@/components/form/input/InputField';
+import Label from '@/components/form/Label';
+import Button from '@/components/ui/button/Button';
+import { useRouter } from 'next/navigation';
 
 interface AgendaFormData {
   name: string;
   description: string;
-  status: "draft" | "published" | "finalized" | "pending" | "in_progress";
+  status: 'draft' | 'published' | 'finalized' | 'pending' | 'in_progress';
   sort_order: number;
   presenter_name: string;
   ministry_id: string;
@@ -19,60 +19,70 @@ interface AgendaFormData {
 }
 
 const ministries = [
-  { id: "ministry-env", name: "Ministry of Environment" },
-  { id: "ministry-transport", name: "Ministry of Transport" },
-  { id: "ministry-energy", name: "Ministry of Energy" },
-  { id: "ministry-finance", name: "Ministry of Finance" },
-  { id: "ministry-health", name: "Ministry of Health" },
-  { id: "", name: "No Ministry (General)" },
+  { id: 'ministry-env', name: 'Ministry of Environment' },
+  { id: 'ministry-transport', name: 'Ministry of Transport' },
+  { id: 'ministry-energy', name: 'Ministry of Energy' },
+  { id: 'ministry-finance', name: 'Ministry of Finance' },
+  { id: 'ministry-health', name: 'Ministry of Health' },
+  { id: '', name: 'No Ministry (General)' },
 ];
 
 const meetings = [
-  { id: "meeting-001", name: "Cabinet Meeting - January 2024", date: "2024-01-18" },
-  { id: "meeting-002", name: "Infrastructure Committee - January 2024", date: "2024-01-20" },
-  { id: "meeting-003", name: "Budget Review - Q1 2024", date: "2024-01-25" },
+  {
+    id: 'meeting-001',
+    name: 'Cabinet Meeting - January 2024',
+    date: '2024-01-18',
+  },
+  {
+    id: 'meeting-002',
+    name: 'Infrastructure Committee - January 2024',
+    date: '2024-01-20',
+  },
+  { id: 'meeting-003', name: 'Budget Review - Q1 2024', date: '2024-01-25' },
 ];
 
 const statusOptions = [
-  { id: "draft", name: "Draft" },
-  { id: "pending", name: "Pending" },
-  { id: "in_progress", name: "In Progress" },
-  { id: "published", name: "Published" },
-  { id: "finalized", name: "Finalized" },
+  { id: 'draft', name: 'Draft' },
+  { id: 'pending', name: 'Pending' },
+  { id: 'in_progress', name: 'In Progress' },
+  { id: 'published', name: 'Published' },
+  { id: 'finalized', name: 'Finalized' },
 ];
 
 export default function CreateAgendaForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<AgendaFormData>({
-    name: "",
-    description: "",
-    status: "draft",
+    name: '',
+    description: '',
+    status: 'draft',
     sort_order: 1,
-    presenter_name: "",
-    ministry_id: "",
-    memo_id: "",
+    presenter_name: '',
+    ministry_id: '',
+    memo_id: '',
     cabinet_approval_required: false,
-    meeting_id: "",
+    meeting_id: '',
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     const { name, value, type } = e.target;
-    
+
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
-      setFormData(prev => ({ ...prev, [name]: checked }));
+      setFormData((prev) => ({ ...prev, [name]: checked }));
     } else if (name === 'sort_order') {
-      setFormData(prev => ({ ...prev, [name]: parseInt(value) || 1 }));
+      setFormData((prev) => ({ ...prev, [name]: parseInt(value) || 1 }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       const response = await fetch('/api/agendas', {
         method: 'POST',
@@ -84,8 +94,8 @@ export default function CreateAgendaForm() {
 
       if (response.ok) {
         const newAgenda = await response.json();
-        console.log("Agenda created:", newAgenda);
-        
+        console.log('Agenda created:', newAgenda);
+
         // Redirect to agendas list or the new agenda
         router.push('/agendas');
         router.refresh();
@@ -111,7 +121,7 @@ export default function CreateAgendaForm() {
           Add a new agenda item to the meeting
         </p>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         {/* Basic Information */}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -142,7 +152,7 @@ export default function CreateAgendaForm() {
               required
             >
               <option value="">Select meeting</option>
-              {meetings.map(meeting => (
+              {meetings.map((meeting) => (
                 <option key={meeting.id} value={meeting.id}>
                   {meeting.name} - {new Date(meeting.date).toLocaleDateString()}
                 </option>
@@ -173,8 +183,8 @@ export default function CreateAgendaForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
               <option value="">Select ministry (optional)</option>
-              {ministries.map(ministry => (
-                <option key={ministry.id} value={ministry.id || ""}>
+              {ministries.map((ministry) => (
+                <option key={ministry.id} value={ministry.id || ''}>
                   {ministry.name}
                 </option>
               ))}
@@ -232,7 +242,7 @@ export default function CreateAgendaForm() {
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
-              {statusOptions.map(status => (
+              {statusOptions.map((status) => (
                 <option key={status.id} value={status.id}>
                   {status.name}
                 </option>
@@ -266,8 +276,18 @@ export default function CreateAgendaForm() {
             </p>
           </div>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center dark:border-gray-600">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
               Upload supporting documents after creating the agenda item
@@ -285,11 +305,8 @@ export default function CreateAgendaForm() {
           >
             Cancel
           </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Creating Agenda Item..." : "Create Agenda Item"}
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Creating Agenda Item...' : 'Create Agenda Item'}
           </Button>
         </div>
       </form>

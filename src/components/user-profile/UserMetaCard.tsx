@@ -1,33 +1,33 @@
-"use client";
-import React from "react";
-import { useModal } from "../../hooks/useModal";
-import { Modal } from "../ui/modal";
-import Button from "../ui/button/Button";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
-import Image from "next/image";
-import { useSession } from "next-auth/react";
+'use client';
+import React from 'react';
+import { useModal } from '../../hooks/useModal';
+import { Modal } from '../ui/modal';
+import Button from '../ui/button/Button';
+import Input from '../form/input/InputField';
+import Label from '../form/Label';
+import Image from 'next/image';
+import { useSession } from 'next-auth/react';
 
 export default function UserMetaCard() {
   const { isOpen, openModal, closeModal } = useModal();
   const { data: session, status, update } = useSession();
-  
-  const isLoading = status === "loading";
+
+  const isLoading = status === 'loading';
   const user = session?.user;
 
   const handleSave = async () => {
     // Handle save logic here - you can integrate with your API
-    console.log("Saving changes...");
-    
+    console.log('Saving changes...');
+
     // Example: Update session with new data
-    // await update({ 
+    // await update({
     //   ...session,
     //   user: {
     //     ...session.user,
     //     name: "Updated Name", // You'd get this from form state
     //   }
     // });
-    
+
     closeModal();
   };
 
@@ -36,7 +36,7 @@ export default function UserMetaCard() {
     if (user?.image) {
       return user.image;
     }
-    return "/images/user/owner.jpg"; // Fallback image
+    return '/images/user/owner.jpg'; // Fallback image
   };
 
   // Get user image alt text
@@ -61,7 +61,10 @@ export default function UserMetaCard() {
             </div>
             <div className="flex items-center order-2 gap-2 grow xl:order-3 xl:justify-end">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-11 w-11 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+                <div
+                  key={i}
+                  className="h-11 w-11 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"
+                ></div>
               ))}
             </div>
           </div>
@@ -91,7 +94,7 @@ export default function UserMetaCard() {
                 onError={(e) => {
                   // Fallback if image fails to load
                   const target = e.target as HTMLImageElement;
-                  target.src = "/images/user/owner.jpg";
+                  target.src = '/images/user/owner.jpg';
                 }}
               />
             </div>
@@ -110,10 +113,10 @@ export default function UserMetaCard() {
               </div>
             </div>
             <div className="flex items-center order-2 gap-2 grow xl:order-3 xl:justify-end">
-              <a        
+              <a
                 target="_blank"
-                rel="noreferrer" 
-                href='https://www.facebook.com/PimjoHQ' 
+                rel="noreferrer"
+                href="https://www.facebook.com/PimjoHQ"
                 className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 transition-colors duration-200"
               >
                 <svg
@@ -131,10 +134,10 @@ export default function UserMetaCard() {
                 </svg>
               </a>
 
-              <a 
-                href='https://x.com/PimjoHQ' 
+              <a
+                href="https://x.com/PimjoHQ"
                 target="_blank"
-                rel="noreferrer"  
+                rel="noreferrer"
                 className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 transition-colors duration-200"
               >
                 <svg
@@ -152,10 +155,10 @@ export default function UserMetaCard() {
                 </svg>
               </a>
 
-              <a 
-                href="https://www.linkedin.com/company/pimjo" 
+              <a
+                href="https://www.linkedin.com/company/pimjo"
                 target="_blank"
-                rel="noreferrer" 
+                rel="noreferrer"
                 className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 transition-colors duration-200"
               >
                 <svg
@@ -173,10 +176,10 @@ export default function UserMetaCard() {
                 </svg>
               </a>
 
-              <a 
-                href='https://instagram.com/PimjoHQ' 
+              <a
+                href="https://instagram.com/PimjoHQ"
                 target="_blank"
-                rel="noreferrer" 
+                rel="noreferrer"
                 className="flex h-11 w-11 items-center justify-center gap-2 rounded-full border border-gray-300 bg-white text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200 transition-colors duration-200"
               >
                 <svg
@@ -218,7 +221,7 @@ export default function UserMetaCard() {
           </button>
         </div>
       </div>
-      
+
       {/* Edit Profile Modal */}
       <Modal isOpen={isOpen} onClose={closeModal} className="max-w-[700px] m-4">
         <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
@@ -240,10 +243,7 @@ export default function UserMetaCard() {
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div>
                     <Label>Facebook</Label>
-                    <Input
-                      type="text"
-                      defaultValue="https://www.facebook.com/PimjoHQ"
-                    />
+                    <Input type="text" defaultValue="https://www.facebook.com/PimjoHQ" />
                   </div>
 
                   <div>
@@ -253,18 +253,12 @@ export default function UserMetaCard() {
 
                   <div>
                     <Label>Linkedin</Label>
-                    <Input
-                      type="text"
-                      defaultValue="https://www.linkedin.com/company/pimjo"
-                    />
+                    <Input type="text" defaultValue="https://www.linkedin.com/company/pimjo" />
                   </div>
 
                   <div>
                     <Label>Instagram</Label>
-                    <Input
-                      type="text"
-                      defaultValue="https://instagram.com/PimjoHQ"
-                    />
+                    <Input type="text" defaultValue="https://instagram.com/PimjoHQ" />
                   </div>
                 </div>
               </div>
@@ -276,27 +270,27 @@ export default function UserMetaCard() {
                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                   <div className="col-span-2 lg:col-span-1">
                     <Label>First Name</Label>
-                    <Input 
-                      type="text" 
-                      defaultValue={user.name?.split(' ')[0] || ''} 
+                    <Input
+                      type="text"
+                      defaultValue={user.name?.split(' ')[0] || ''}
                       placeholder="First name"
                     />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Last Name</Label>
-                    <Input 
-                      type="text" 
-                      defaultValue={user.name?.split(' ').slice(1).join(' ') || ''} 
+                    <Input
+                      type="text"
+                      defaultValue={user.name?.split(' ').slice(1).join(' ') || ''}
                       placeholder="Last name"
                     />
                   </div>
 
                   <div className="col-span-2 lg:col-span-1">
                     <Label>Email Address</Label>
-                    <Input 
-                      type="email" 
-                      defaultValue={user.email || ''} 
+                    <Input
+                      type="email"
+                      defaultValue={user.email || ''}
                       placeholder="Email address"
                       disabled // Email is usually not editable
                     />
@@ -309,16 +303,16 @@ export default function UserMetaCard() {
 
                   <div className="col-span-2">
                     <Label>Role/Position</Label>
-                    <Input 
-                      type="text" 
-                      defaultValue={user.role || 'Team Member'} 
+                    <Input
+                      type="text"
+                      defaultValue={user.role || 'Team Member'}
                       placeholder="Your role or position"
                     />
                   </div>
 
                   <div className="col-span-2">
                     <Label>Bio</Label>
-                    <textarea 
+                    <textarea
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
                       rows={3}
                       placeholder="Tell us about yourself..."

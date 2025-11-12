@@ -52,12 +52,8 @@ export async function GET(request: NextRequest) {
     const committees = await query(queryStr, params);
 
     return NextResponse.json(committees.rows);
-    
   } catch (error: unknown) {
     console.error('Error fetching committees:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch committees' }, 
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch committees' }, { status: 500 });
   }
 }

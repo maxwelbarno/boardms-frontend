@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = await params;
     const agendaId = id;
@@ -22,15 +19,12 @@ export async function GET(
       LEFT JOIN users u ON a.presenter_id = u.id
       WHERE a.id = $1
       `,
-      [agendaId]
+      [agendaId],
     );
 
     if (result.rows.length === 0) {
       console.log('❌ Agenda item not found:', agendaId);
-      return NextResponse.json(
-        { error: 'Agenda item not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Agenda item not found' }, { status: 404 });
     }
 
     const agenda = result.rows[0];
@@ -39,17 +33,11 @@ export async function GET(
     return NextResponse.json(agenda);
   } catch (error) {
     console.error('❌ Error fetching agenda item:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch agenda item' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch agenda item' }, { status: 500 });
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = await params;
     const agendaId = id;
@@ -60,26 +48,20 @@ export async function PUT(
     // Validate required fields
     if (!agendaData.name) {
       return NextResponse.json(
-        { 
+        {
           error: 'Missing required field',
           details: 'name is required',
-          received: agendaData
+          received: agendaData,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Check if agenda exists
-    const existingAgenda = await query(
-      'SELECT id FROM agenda WHERE id = $1',
-      [agendaId]
-    );
+    const existingAgenda = await query('SELECT id FROM agenda WHERE id = $1', [agendaId]);
 
     if (existingAgenda.rows.length === 0) {
-      return NextResponse.json(
-        { error: 'Agenda item not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Agenda item not found' }, { status: 404 });
     }
 
     // Handle both presenter_id and presenter_id
@@ -90,7 +72,7 @@ export async function PUT(
       sort_order: agendaData.sort_order || 1,
       presenter_id: agendaData.presenter_id || null,
       ministry_id: agendaData.ministry_id || null,
-      cabinet_approval_required: agendaData.cabinet_approval_required || false
+      cabinet_approval_required: agendaData.cabinet_approval_required || false,
     };
 
     console.log('🔄 Updating agenda with data:', updateData);
@@ -118,8 +100,8 @@ export async function PUT(
         updateData.presenter_id,
         updateData.ministry_id,
         updateData.cabinet_approval_required,
-        agendaId
-      ]
+        agendaId,
+      ],
     );
 
     if (result.rows.length === 0) {
@@ -130,25 +112,21 @@ export async function PUT(
     console.log('✅ Agenda item updated successfully:', updatedAgenda);
 
     return NextResponse.json(updatedAgenda);
-
   } catch (error: any) {
     console.error('❌ Error updating agenda item:', error);
-    
+
     const errorResponse = {
       error: 'Failed to update agenda item',
       details: error.message,
       code: error.code,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-    
+
     return NextResponse.json(errorResponse, { status: 500 });
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = await params;
     const agendaId = id;
@@ -156,32 +134,19 @@ export async function DELETE(
     console.log('🗑️ Deleting agenda item:', agendaId);
 
     // Check if agenda exists
-    const existingAgenda = await query(
-      'SELECT id FROM agenda WHERE id = $1',
-      [agendaId]
-    );
+    const existingAgenda = await query('SELECT id FROM agenda WHERE id = $1', [agendaId]);
 
     if (existingAgenda.rows.length === 0) {
-      return NextResponse.json(
-        { error: 'Agenda item not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Agenda item not found' }, { status: 404 });
     }
 
     // Delete the agenda item
-    await query(
-      'DELETE FROM agenda WHERE id = $1',
-      [agendaId]
-    );
+    await query('DELETE FROM agenda WHERE id = $1', [agendaId]);
 
     console.log('✅ Agenda item deleted successfully:', agendaId);
     return NextResponse.json({ success: true });
-
   } catch (error) {
     console.error('❌ Error deleting agenda item:', error);
-    return NextResponse.json(
-      { error: 'Failed to delete agenda item' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to delete agenda item' }, { status: 500 });
   }
 }

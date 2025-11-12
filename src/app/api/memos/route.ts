@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import pool from "@/lib/db"
+import pool from '@/lib/db';
 
 // GET handler to fetch ALL memos
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -15,10 +15,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type'); // 'my' or 'all'
     const client = await pool.connect();
-    
+
     try {
       console.log('Fetching memos for user:', session.user.id, 'type:', type);
-      
+
       let query = `
         SELECT 
           gm.id,
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
         LEFT JOIN agencies a ON gm.agency_id = a.id
         LEFT JOIN users u ON gm.created_by = u.id
       `;
-      
+
       const queryParams: any[] = [];
 
       // If type is 'my', only show memos created by current user
@@ -59,24 +59,23 @@ export async function GET(request: NextRequest) {
       const result = await client.query(query, queryParams);
 
       console.log(`Found ${result.rows.length} memos`);
-      
+
       return NextResponse.json({
         success: true,
         data: result.rows, // Wrap in data property
-        count: result.rows.length
+        count: result.rows.length,
       });
-      
     } finally {
       client.release();
     }
   } catch (error) {
     console.error('Error fetching memos:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to fetch memos',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -85,30 +84,30 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
-    
+
     // Enhanced debugging - log everything received
     console.log('=== MEMO CREATION DEBUG INFO ===');
     console.log('Session User ID:', session.user.id);
     console.log('Received request body:', JSON.stringify(body, null, 2));
-    
-    const { 
-      name, 
-      summary, 
-      body: memoBody, 
-      memo_type, 
-      priority, 
+
+    const {
+      name,
+      summary,
+      body: memoBody,
+      memo_type,
+      priority,
       ministry_id,
       state_department_id,
       agency_id,
       affected_entities = [],
       status,
-      workflow
+      workflow,
     } = body;
 
     // Validate required fields with specific error messages
@@ -121,7 +120,7 @@ export async function POST(request: NextRequest) {
     if (missingFields.length > 0) {
       console.log('Missing required fields:', missingFields);
       return NextResponse.json(
-        { 
+        {
           error: 'Missing required fields',
           missingFields,
           receivedData: {
@@ -130,10 +129,10 @@ export async function POST(request: NextRequest) {
             body: !!memoBody,
             ministry_id: !!ministry_id,
             state_department_id: !!state_department_id,
-            agency_id: !!agency_id
-          }
+            agency_id: !!agency_id,
+          },
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -143,29 +142,32 @@ export async function POST(request: NextRequest) {
       await client.query('BEGIN');
 
       console.log('Inserting memo into database...');
-      
+
       // Insert memo with new schema including updated_by
-      const memoResult = await client.query(`
+      const memoResult = await client.query(
+        `
         INSERT INTO gov_memos (
           name, summary, body, memo_type, priority, 
           ministry_id, state_department_id, agency_id,
           created_by, updated_by, status, submitted_at
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
         RETURNING *
-      `, [
-        name, 
-        summary, 
-        memoBody, 
-        memo_type || 'cabinet', 
-        priority || 'medium', 
-        parseInt(ministry_id), 
-        state_department_id ? parseInt(state_department_id) : null, 
-        agency_id ? parseInt(agency_id) : null,
-        session.user.id,
-        session.user.id, // updated_by same as created_by initially
-        status || 'draft',
-        status === 'submitted' ? new Date() : null
-      ]);
+      `,
+        [
+          name,
+          summary,
+          memoBody,
+          memo_type || 'cabinet',
+          priority || 'medium',
+          parseInt(ministry_id),
+          state_department_id ? parseInt(state_department_id) : null,
+          agency_id ? parseInt(agency_id) : null,
+          session.user.id,
+          session.user.id, // updated_by same as created_by initially
+          status || 'draft',
+          status === 'submitted' ? new Date() : null,
+        ],
+      );
 
       const memo = memoResult.rows[0];
       console.log('Successfully created memo with ID:', memo.id);
@@ -173,31 +175,40 @@ export async function POST(request: NextRequest) {
       // Handle affected entities if provided
       if (affected_entities && affected_entities.length > 0) {
         console.log('Processing affected entities:', affected_entities);
-        
+
         for (const entityId of affected_entities) {
           const [entityType, id] = entityId.split('_');
           const entityIdNum = parseInt(id);
-          
+
           console.log(`Processing entity: ${entityType} with ID: ${entityIdNum}`);
 
           if (entityType === 'ministry') {
-            await client.query(`
+            await client.query(
+              `
               INSERT INTO memo_affected_entities (
                 memo_id, ministry_id, entity_type
               ) VALUES ($1, $2, 'ministry')
-            `, [memo.id, entityIdNum]);
+            `,
+              [memo.id, entityIdNum],
+            );
           } else if (entityType === 'state_department') {
-            await client.query(`
+            await client.query(
+              `
               INSERT INTO memo_affected_entities (
                 memo_id, state_department_id, entity_type
               ) VALUES ($1, $2, 'state_department')
-            `, [memo.id, entityIdNum]);
+            `,
+              [memo.id, entityIdNum],
+            );
           } else if (entityType === 'agency') {
-            await client.query(`
+            await client.query(
+              `
               INSERT INTO memo_affected_entities (
                 memo_id, agency_id, entity_type
               ) VALUES ($1, $2, 'agency')
-            `, [memo.id, entityIdNum]);
+            `,
+              [memo.id, entityIdNum],
+            );
           }
         }
         console.log('Completed processing affected entities');
@@ -206,27 +217,32 @@ export async function POST(request: NextRequest) {
       // Insert workflow information if provided
       if (workflow) {
         console.log('Inserting workflow data:', workflow);
-        await client.query(`
+        await client.query(
+          `
           INSERT INTO memo_workflows (
             memo_id, current_stage, next_stage, target_committee
           ) VALUES ($1, $2, $3, $4)
-        `, [memo.id, workflow.current_stage, workflow.next_stage, workflow.target_committee]);
+        `,
+          [memo.id, workflow.current_stage, workflow.next_stage, workflow.target_committee],
+        );
       }
 
       await client.query('COMMIT');
       console.log('Transaction committed successfully');
-      
+
       // Return success with debug info
-      return NextResponse.json({
-        success: true,
-        memo,
-        debug: {
-          sessionUserId: session.user.id,
-          receivedFields: Object.keys(body),
-          timestamp: new Date().toISOString()
-        }
-      }, { status: 201 });
-      
+      return NextResponse.json(
+        {
+          success: true,
+          memo,
+          debug: {
+            sessionUserId: session.user.id,
+            receivedFields: Object.keys(body),
+            timestamp: new Date().toISOString(),
+          },
+        },
+        { status: 201 },
+      );
     } catch (error) {
       await client.query('ROLLBACK');
       console.error('Transaction error:', error);
@@ -237,14 +253,14 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating memo:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to create memo',
         debug: {
           message: error instanceof Error ? error.message : 'Unknown error',
-          timestamp: new Date().toISOString()
-        }
+          timestamp: new Date().toISOString(),
+        },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

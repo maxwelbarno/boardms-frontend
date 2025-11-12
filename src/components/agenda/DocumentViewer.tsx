@@ -1,5 +1,5 @@
 // app/components/documents/DocumentViewer.tsx
-"use client";
+'use client';
 import React, { useState } from 'react';
 import { FileText, Download, X, MessageSquare } from 'lucide-react';
 
@@ -45,9 +45,7 @@ export default function DocumentViewer({ document, onClose }: DocumentViewerProp
           <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8 min-h-[600px] flex items-center justify-center">
             <div className="text-center">
               <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">
-                Document preview for {document.file_type}
-              </p>
+              <p className="text-gray-500">Document preview for {document.file_type}</p>
               <p className="text-sm text-gray-400 mt-2">
                 Integrated document viewer would appear here
               </p>

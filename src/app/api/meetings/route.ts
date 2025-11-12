@@ -24,10 +24,7 @@ export async function GET(request: NextRequest) {
       params.push(type);
     }
 
-    const whereClause =
-      whereConditions.length > 0
-        ? `WHERE ${whereConditions.join(' AND ')}`
-        : '';
+    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
     console.log('Fetching meetings with query...', whereClause, params);
 
@@ -67,7 +64,7 @@ export async function GET(request: NextRequest) {
         chair.name, chair.email, created_by_user.name, approved_by_user.name
       ORDER BY m.start_at DESC
       `,
-      params
+      params,
     );
 
     console.log(`✅ Found ${meetings.rows.length} meetings`);
@@ -81,31 +78,22 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // Validate required fields
     if (!body.meeting_id) {
-      return NextResponse.json(
-        { error: 'Meeting ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Meeting ID is required' }, { status: 400 });
     }
 
     if (!body.name || body.name.trim() === '') {
-      return NextResponse.json(
-        { error: 'Agenda name is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Agenda name is required' }, { status: 400 });
     }
 
     // Ensure data types are correct
     const meetingId = Number(body.meeting_id);
     const name = String(body.name).trim();
-    
+
     if (isNaN(meetingId)) {
-      return NextResponse.json(
-        { error: 'Invalid meeting ID' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid meeting ID' }, { status: 400 });
     }
 
     // Calculate next sort order
@@ -113,11 +101,11 @@ export async function POST(request: NextRequest) {
     if (!sort_order) {
       const lastAgenda = await prisma.agenda.findFirst({
         where: { meeting_id: meetingId },
-        orderBy: { sort_order: 'desc' }
+        orderBy: { sort_order: 'desc' },
       });
       sort_order = lastAgenda ? lastAgenda.sort_order + 1 : 1;
     }
-    
+
     const agenda = await prisma.agenda.create({
       data: {
         meeting_id: meetingId,
@@ -133,16 +121,13 @@ export async function POST(request: NextRequest) {
       include: {
         documents: true,
         ministry: true,
-      }
+      },
     });
 
     return NextResponse.json(agenda);
   } catch (error) {
     console.error('Error creating agenda:', error);
-    return NextResponse.json(
-      { error: 'Failed to create agenda' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create agenda' }, { status: 500 });
   }
 }
 
@@ -150,37 +135,36 @@ export async function PUT(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-    
+
     if (!id) {
-      return NextResponse.json(
-        { error: 'Meeting ID is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Meeting ID is required' }, { status: 400 });
     }
 
     const meetingData = await request.json();
-    
+
     console.log('📝 Updating meeting:', { id, ...meetingData });
 
     // Validate required fields
-    if (!meetingData.name || !meetingData.type || !meetingData.start_at || !meetingData.location || !meetingData.status) {
+    if (
+      !meetingData.name ||
+      !meetingData.type ||
+      !meetingData.start_at ||
+      !meetingData.location ||
+      !meetingData.status
+    ) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, type, start_at, location, status' },
-        { status: 400 }
+        {
+          error: 'Missing required fields: name, type, start_at, location, status',
+        },
+        { status: 400 },
       );
     }
 
     // Check if meeting exists
-    const existingMeeting = await query(
-      'SELECT id FROM meetings WHERE id = $1',
-      [id]
-    );
+    const existingMeeting = await query('SELECT id FROM meetings WHERE id = $1', [id]);
 
     if (existingMeeting.rows.length === 0) {
-      return NextResponse.json(
-        { error: 'Meeting not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Meeting not found' }, { status: 404 });
     }
 
     // Update the meeting
@@ -214,8 +198,8 @@ export async function PUT(request: NextRequest) {
         meetingData.description || '',
         meetingData.colour || '#3b82f6',
         meetingData.approved_by || null,
-        id
-      ]
+        id,
+      ],
     );
 
     if (result.rows.length === 0) {
@@ -226,15 +210,14 @@ export async function PUT(request: NextRequest) {
     console.log('✅ Meeting updated successfully:', updatedMeeting.id);
 
     return NextResponse.json(updatedMeeting);
-
   } catch (error) {
     console.error('❌ Error updating meeting:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to update meeting',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      }, 
-      { status: 500 }
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
     );
   }
 }

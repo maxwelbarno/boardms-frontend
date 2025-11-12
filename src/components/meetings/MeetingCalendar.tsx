@@ -1,21 +1,16 @@
 // app/components/meetings/MeetingCalendar.tsx - FIXED VERSION
-"use client";
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
+'use client';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import { EventInput, DateSelectArg, EventClickArg, EventContentArg } from '@fullcalendar/core';
 import {
-  EventInput,
-  DateSelectArg,
-  EventClickArg,
-  EventContentArg,
-} from "@fullcalendar/core";
-import { 
-  MapPin, 
-  CheckCircle, 
-  Clock, 
-  XCircle, 
+  MapPin,
+  CheckCircle,
+  Clock,
+  XCircle,
   Loader2,
   X,
   Users,
@@ -23,19 +18,19 @@ import {
   Tag,
   Globe,
   Eye,
-  ExternalLink
-} from "lucide-react";
-import { 
-  formatDateForInput, 
-  parseDateFromInput, 
+  ExternalLink,
+} from 'lucide-react';
+import {
+  formatDateForInput,
+  parseDateFromInput,
   setSystemTimezone,
   getSystemTimezone,
   toTimezone,
   addMinutes,
   formatDate,
-  formatDateTime 
-} from "@/lib/utils/date-utils";
-import Link from "next/link";
+  formatDateTime,
+} from '@/lib/utils/date-utils';
+import Link from 'next/link';
 
 interface CalendarEvent extends EventInput {
   extendedProps: {
@@ -97,20 +92,20 @@ const Calendar: React.FC = () => {
   const [systemSettings, setSystemSettings] = useState<SystemSettings>({
     timezone: 'UTC',
     date_format: 'YYYY-MM-DD',
-    timezones: []
+    timezones: [],
   });
   const calendarRef = useRef<FullCalendar>(null);
 
   const [formData, setFormData] = useState<MeetingFormData>({
-    name: "",
-    type: "",
-    start_at: "",
-    period: "60",
-    location: "",
-    chair_id: "",
-    status: "",
-    description: "",
-    colour: "#3b82f6"
+    name: '',
+    type: '',
+    start_at: '',
+    period: '60',
+    location: '',
+    chair_id: '',
+    status: '',
+    description: '',
+    colour: '#3b82f6',
   });
 
   // Fetch system settings
@@ -123,14 +118,14 @@ const Calendar: React.FC = () => {
           setSystemSettings({
             timezone: settings.timezone || 'UTC',
             date_format: settings.date_format || 'YYYY-MM-DD',
-            timezones: settings.timezones || []
+            timezones: settings.timezones || [],
           });
-          
+
           // Initialize date-utils with system timezone
           setSystemTimezone(settings.timezone || 'UTC');
           console.log(`🌍 System settings loaded:`, {
             timezone: settings.timezone,
-            date_format: settings.date_format
+            date_format: settings.date_format,
           });
         }
       } catch (error) {
@@ -151,28 +146,28 @@ const Calendar: React.FC = () => {
 
   // Get appropriate chair based on meeting type
   const getDefaultChairForMeetingType = (meetingType: string): string => {
-    if (!meetingType || !chairs.length) return "";
-    
+    if (!meetingType || !chairs.length) return '';
+
     const typeLower = meetingType.toLowerCase();
-    
+
     if (typeLower.includes('cabinet')) {
       // Find president
-      const president = chairs.find(chair => 
-        chair.role.toLowerCase().includes('president') && 
-        !chair.role.toLowerCase().includes('deputy')
+      const president = chairs.find(
+        (chair) =>
+          chair.role.toLowerCase().includes('president') &&
+          !chair.role.toLowerCase().includes('deputy'),
       );
-      return president?.id || "";
-    } 
-    else if (typeLower.includes('committee')) {
+      return president?.id || '';
+    } else if (typeLower.includes('committee')) {
       // Find deputy president
-      const deputyPresident = chairs.find(chair => 
-        chair.role.toLowerCase().includes('deputy') || 
-        chair.role.toLowerCase().includes('vice')
+      const deputyPresident = chairs.find(
+        (chair) =>
+          chair.role.toLowerCase().includes('deputy') || chair.role.toLowerCase().includes('vice'),
       );
-      return deputyPresident?.id || "";
+      return deputyPresident?.id || '';
     }
-    
-    return "";
+
+    return '';
   };
 
   // Fetch all required data
@@ -180,19 +175,26 @@ const Calendar: React.FC = () => {
     const fetchData = async () => {
       try {
         setIsLoadingData(true);
-        console.log("Starting data fetch...");
-        
+        console.log('Starting data fetch...');
+
         // Fetch categories by type in parallel with proper error handling
-        const [locationsRes, meetingTypesRes, meetingStatusesRes, coloursRes, chairsRes, meetingsRes] = await Promise.all([
+        const [
+          locationsRes,
+          meetingTypesRes,
+          meetingStatusesRes,
+          coloursRes,
+          chairsRes,
+          meetingsRes,
+        ] = await Promise.all([
           fetch('/api/categories?type=location'),
           fetch('/api/categories?type=meeting'),
           fetch('/api/categories?type=meeting_status'),
           fetch('/api/categories?type=colour'),
           fetch('/api/users?role=all'),
-          fetch('/api/meetings')
+          fetch('/api/meetings'),
         ]);
 
-        console.log("API responses received");
+        console.log('API responses received');
 
         // Handle responses with error checking
         const locationsData = locationsRes.ok ? await locationsRes.json() : [];
@@ -202,13 +204,13 @@ const Calendar: React.FC = () => {
         const chairsData = chairsRes.ok ? await chairsRes.json() : [];
         const meetingsData = meetingsRes.ok ? await meetingsRes.json() : [];
 
-        console.log("Data counts:", {
+        console.log('Data counts:', {
           locations: locationsData.length,
           meetingTypes: meetingTypesData.length,
           meetingStatuses: meetingStatusesData.length,
           colours: coloursData.length,
           chairs: chairsData.length,
-          meetings: meetingsData.length
+          meetings: meetingsData.length,
         });
 
         setLocations(locationsData);
@@ -219,20 +221,24 @@ const Calendar: React.FC = () => {
 
         // Set default status if available
         if (meetingStatusesData.length > 0) {
-          const defaultStatus = meetingStatusesData.find((status: Category) => 
-            status.name.toLowerCase() === 'scheduled'
-          ) || meetingStatusesData[0];
-          setFormData(prev => ({ ...prev, status: defaultStatus.name }));
-          console.log("Default status set to:", defaultStatus.name);
+          const defaultStatus =
+            meetingStatusesData.find(
+              (status: Category) => status.name.toLowerCase() === 'scheduled',
+            ) || meetingStatusesData[0];
+          setFormData((prev) => ({ ...prev, status: defaultStatus.name }));
+          console.log('Default status set to:', defaultStatus.name);
         }
 
         // Set default colour if available
         if (coloursData.length > 0) {
-          const defaultColour = coloursData.find((colour: Category) => 
-            colour.name.toLowerCase() === 'blue'
-          ) || coloursData[0];
-          setFormData(prev => ({ ...prev, colour: defaultColour.colour || "#3b82f6" }));
-          console.log("Default colour set to:", defaultColour.colour);
+          const defaultColour =
+            coloursData.find((colour: Category) => colour.name.toLowerCase() === 'blue') ||
+            coloursData[0];
+          setFormData((prev) => ({
+            ...prev,
+            colour: defaultColour.colour || '#3b82f6',
+          }));
+          console.log('Default colour set to:', defaultColour.colour);
         }
 
         // Transform meetings data for calendar
@@ -249,13 +255,12 @@ const Calendar: React.FC = () => {
             status: meeting.status,
             description: meeting.description,
             colour: meeting.colour,
-            period: meeting.period
-          }
+            period: meeting.period,
+          },
         }));
         setEvents(calendarEvents);
 
-        console.log("Data fetch completed successfully");
-
+        console.log('Data fetch completed successfully');
       } catch (error) {
         console.error('Error in fetchData:', error);
       } finally {
@@ -268,31 +273,33 @@ const Calendar: React.FC = () => {
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
     resetForm();
-    
+
     // Get the selected date and convert to system timezone
     const startDate = selectInfo.start;
     const dateInSystemTimezone = toTimezone(startDate, systemSettings.timezone);
-    
+
     // Format for datetime-local input using system timezone
     const formattedDate = formatDateForInput(dateInSystemTimezone, systemSettings.timezone);
-    
-    console.log("Date selected:", { 
+
+    console.log('Date selected:', {
       original: startDate,
       systemTimezone: systemSettings.timezone,
       inSystemTimezone: dateInSystemTimezone,
-      formattedDate 
+      formattedDate,
     });
-    
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
       start_at: formattedDate,
-      period: "60",
-      status: meetingStatuses.find(status => 
-        status.name.toLowerCase() === 'scheduled'
-      )?.name || meetingStatuses[0]?.name || '',
-      colour: colours.find(colour => 
-        colour.name.toLowerCase() === 'blue'
-      )?.colour || colours[0]?.colour || "#3b82f6"
+      period: '60',
+      status:
+        meetingStatuses.find((status) => status.name.toLowerCase() === 'scheduled')?.name ||
+        meetingStatuses[0]?.name ||
+        '',
+      colour:
+        colours.find((colour) => colour.name.toLowerCase() === 'blue')?.colour ||
+        colours[0]?.colour ||
+        '#3b82f6',
     }));
     openSlider();
   };
@@ -300,32 +307,32 @@ const Calendar: React.FC = () => {
   const handleEventClick = (clickInfo: EventClickArg) => {
     const event = clickInfo.event;
     const extendedProps = event.extendedProps;
-    
+
     // Convert event date to system timezone for display
     const startDate = event.start ? new Date(event.start) : new Date();
     const dateInSystemTimezone = toTimezone(startDate, systemSettings.timezone);
     const formattedDate = formatDateForInput(dateInSystemTimezone, systemSettings.timezone);
-    
+
     setSelectedEvent(event as unknown as CalendarEvent);
     setFormData({
-      name: event.title || "",
-      type: extendedProps.type || "",
+      name: event.title || '',
+      type: extendedProps.type || '',
       start_at: formattedDate,
-      period: extendedProps.period || "60",
-      location: extendedProps.location || "",
-      chair_id: extendedProps.chair_id || "",
-      status: extendedProps.status || "",
-      description: extendedProps.description || "",
-      colour: extendedProps.colour || "#3b82f6"
+      period: extendedProps.period || '60',
+      location: extendedProps.location || '',
+      chair_id: extendedProps.chair_id || '',
+      status: extendedProps.status || '',
+      description: extendedProps.description || '',
+      colour: extendedProps.colour || '#3b82f6',
     });
-    
+
     openSlider();
   };
 
   const handleInputChange = (field: keyof MeetingFormData, value: string) => {
     const newFormData = {
       ...formData,
-      [field]: value
+      [field]: value,
     };
 
     // Auto-assign chair based on meeting type when type changes
@@ -343,12 +350,14 @@ const Calendar: React.FC = () => {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      console.log("🔄 Starting meeting submission...");
-      
+      console.log('🔄 Starting meeting submission...');
+
       // Basic validation
       const requiredFields = ['name', 'type', 'start_at', 'location', 'status'];
-      const missingFields = requiredFields.filter(field => !formData[field as keyof MeetingFormData]);
-      
+      const missingFields = requiredFields.filter(
+        (field) => !formData[field as keyof MeetingFormData],
+      );
+
       if (missingFields.length > 0) {
         throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
       }
@@ -356,21 +365,23 @@ const Calendar: React.FC = () => {
       // Parse the datetime input considering system timezone
       let startDate: Date;
       let endDate: Date;
-      
+
       try {
         startDate = parseDateFromInput(formData.start_at, systemSettings.timezone);
-        console.log("📅 Parsed start date:", {
+        console.log('📅 Parsed start date:', {
           input: formData.start_at,
           parsed: startDate,
           iso: startDate.toISOString(),
-          timezone: systemSettings.timezone
+          timezone: systemSettings.timezone,
         });
-        
+
         // Calculate end date based on period
         endDate = addMinutes(startDate, parseInt(formData.period) || 60, systemSettings.timezone);
       } catch (dateError) {
-        console.error("❌ Date parsing error:", dateError);
-        throw new Error(`Invalid date format: ${formData.start_at}. Please check the date and time.`);
+        console.error('❌ Date parsing error:', dateError);
+        throw new Error(
+          `Invalid date format: ${formData.start_at}. Please check the date and time.`,
+        );
       }
 
       // Prepare meeting data with correct data types
@@ -386,16 +397,14 @@ const Calendar: React.FC = () => {
         colour: formData.colour,
         actual_end: endDate.toISOString(), // Store calculated end time
         created_by: 1, // TODO: Replace with actual logged-in user ID from session
-        approved_by: formData.status.toLowerCase() === "confirmed" ? 1 : null, // TODO: Replace with actual approver ID
-        timezone: systemSettings.timezone // Store the timezone used for creation
+        approved_by: formData.status.toLowerCase() === 'confirmed' ? 1 : null, // TODO: Replace with actual approver ID
+        timezone: systemSettings.timezone, // Store the timezone used for creation
       };
 
-      console.log("📤 Submitting meeting data:", meetingData);
+      console.log('📤 Submitting meeting data:', meetingData);
 
       // FIXED: Use correct URL format for PUT requests
-      const url = selectedEvent 
-        ? `/api/meetings?id=${selectedEvent.id}` 
-        : '/api/meetings';
+      const url = selectedEvent ? `/api/meetings?id=${selectedEvent.id}` : '/api/meetings';
       const method = selectedEvent ? 'PUT' : 'POST';
 
       console.log(`🌐 Making ${method} request to: ${url}`);
@@ -415,37 +424,38 @@ const Calendar: React.FC = () => {
       try {
         responseData = responseText ? JSON.parse(responseText) : {};
       } catch (parseError) {
-        console.error("❌ Failed to parse response:", parseError);
+        console.error('❌ Failed to parse response:', parseError);
         throw new Error(`Server returned invalid response: ${responseText.substring(0, 100)}`);
       }
 
       if (!response.ok) {
-        console.error("❌ Server error response:", {
+        console.error('❌ Server error response:', {
           status: response.status,
           statusText: response.statusText,
-          data: responseData
+          data: responseData,
         });
-        
-        const errorMessage = responseData.error || 
-                            responseData.details || 
-                            responseData.message || 
-                            `Server error: ${response.status} ${response.statusText}`;
-        
+
+        const errorMessage =
+          responseData.error ||
+          responseData.details ||
+          responseData.message ||
+          `Server error: ${response.status} ${response.statusText}`;
+
         throw new Error(errorMessage);
       }
 
       const savedMeeting = responseData;
-      console.log("✅ Meeting saved successfully:", savedMeeting);
+      console.log('✅ Meeting saved successfully:', savedMeeting);
 
       // Refetch all meetings to update calendar
-      console.log("🔄 Refetching meetings...");
+      console.log('🔄 Refetching meetings...');
       const meetingsResponse = await fetch('/api/meetings');
-      
+
       if (!meetingsResponse.ok) {
-        console.warn("⚠️ Failed to refetch meetings, but meeting was saved");
+        console.warn('⚠️ Failed to refetch meetings, but meeting was saved');
       } else {
         const meetingsData = await meetingsResponse.json();
-        
+
         // Transform meetings data for calendar
         const calendarEvents = meetingsData.map((meeting: any) => ({
           id: meeting.id.toString(),
@@ -461,12 +471,12 @@ const Calendar: React.FC = () => {
             description: meeting.description,
             colour: meeting.colour,
             period: meeting.period,
-            timezone: meeting.timezone
-          }
+            timezone: meeting.timezone,
+          },
         }));
-        
+
         setEvents(calendarEvents);
-        console.log("📊 Calendar events updated:", calendarEvents.length);
+        console.log('📊 Calendar events updated:', calendarEvents.length);
       }
 
       closeSlider();
@@ -480,26 +490,25 @@ const Calendar: React.FC = () => {
 
       // Show success message
       alert(`✅ Meeting ${selectedEvent ? 'updated' : 'scheduled'} successfully!`);
-
     } catch (error) {
-      console.error("❌ Error saving meeting:", error);
-      
-      let userMessage = "Failed to save meeting. Please try again.";
-      
+      console.error('❌ Error saving meeting:', error);
+
+      let userMessage = 'Failed to save meeting. Please try again.';
+
       if (error instanceof Error) {
         if (error.message.includes('Missing required fields')) {
           userMessage = error.message;
         } else if (error.message.includes('Invalid date format')) {
           userMessage = error.message;
         } else if (error.message.includes('Network') || error.message.includes('fetch')) {
-          userMessage = "Network error. Please check your connection and try again.";
+          userMessage = 'Network error. Please check your connection and try again.';
         } else if (error.message.includes('Server error')) {
           userMessage = error.message;
         } else {
           userMessage = error.message;
         }
       }
-      
+
       alert(userMessage);
     } finally {
       setIsLoading(false);
@@ -507,24 +516,26 @@ const Calendar: React.FC = () => {
   };
 
   const resetForm = () => {
-    const defaultStatus = meetingStatuses.find(status => 
-      status.name.toLowerCase() === 'scheduled'
-    )?.name || meetingStatuses[0]?.name || '';
+    const defaultStatus =
+      meetingStatuses.find((status) => status.name.toLowerCase() === 'scheduled')?.name ||
+      meetingStatuses[0]?.name ||
+      '';
 
-    const defaultColour = colours.find(colour => 
-      colour.name.toLowerCase() === 'blue'
-    )?.colour || colours[0]?.colour || "#3b82f6";
+    const defaultColour =
+      colours.find((colour) => colour.name.toLowerCase() === 'blue')?.colour ||
+      colours[0]?.colour ||
+      '#3b82f6';
 
     setFormData({
-      name: "",
-      type: "",
-      start_at: "",
-      period: "60",
-      location: "",
-      chair_id: "",
+      name: '',
+      type: '',
+      start_at: '',
+      period: '60',
+      location: '',
+      chair_id: '',
       status: defaultStatus,
-      description: "",
-      colour: defaultColour
+      description: '',
+      colour: defaultColour,
     });
     setSelectedEvent(null);
   };
@@ -545,10 +556,14 @@ const Calendar: React.FC = () => {
     <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
       <div className="flex items-center">
         <Globe className="h-3 w-3 mr-1" />
-        <span>Timezone: <strong>{systemSettings.timezone}</strong></span>
+        <span>
+          Timezone: <strong>{systemSettings.timezone}</strong>
+        </span>
       </div>
       <div>
-        <span>Format: <strong>{systemSettings.date_format}</strong></span>
+        <span>
+          Format: <strong>{systemSettings.date_format}</strong>
+        </span>
       </div>
     </div>
   );
@@ -566,7 +581,7 @@ const Calendar: React.FC = () => {
               View full meeting details
             </span>
           </div>
-          <Link 
+          <Link
             href={`/meetings/${selectedEvent.id}`}
             className="flex items-center px-3 py-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             onClick={(e) => {
@@ -605,8 +620,12 @@ const Calendar: React.FC = () => {
             </p>
           </div>
           <div className="text-right text-sm text-gray-600 dark:text-gray-400">
-            <div>Date Format: <strong>{systemSettings.date_format}</strong></div>
-            <div>Current Time: <strong>{formatSystemDate(new Date(), true)}</strong></div>
+            <div>
+              Date Format: <strong>{systemSettings.date_format}</strong>
+            </div>
+            <div>
+              Current Time: <strong>{formatSystemDate(new Date(), true)}</strong>
+            </div>
           </div>
         </div>
       </div>
@@ -619,9 +638,9 @@ const Calendar: React.FC = () => {
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
             headerToolbar={{
-              left: "prev,next addEventButton",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay",
+              left: 'prev,next addEventButton',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek,timeGridDay',
             }}
             events={events}
             selectable={true}
@@ -630,7 +649,7 @@ const Calendar: React.FC = () => {
             eventContent={renderEventContent}
             customButtons={{
               addEventButton: {
-                text: "Schedule Meeting +",
+                text: 'Schedule Meeting +',
                 click: openSlider,
               },
             }}
@@ -639,26 +658,28 @@ const Calendar: React.FC = () => {
               hour: '2-digit',
               minute: '2-digit',
               hour12: false,
-              meridiem: false
+              meridiem: false,
             }}
           />
         </div>
       </div>
 
       {/* Full Page Slider Overlay */}
-      <div className={`fixed inset-0 z-50 transition-all duration-300 ease-in-out ${
-        isSliderOpen ? 'visible' : 'invisible'
-      }`}>
+      <div
+        className={`fixed inset-0 z-50 transition-all duration-300 ease-in-out ${
+          isSliderOpen ? 'visible' : 'invisible'
+        }`}
+      >
         {/* Full page backdrop */}
-        <div 
+        <div
           className={`absolute inset-0 bg-black transition-opacity duration-300 ${
             isSliderOpen ? 'bg-opacity-50' : 'bg-opacity-0'
           }`}
           onClick={closeSlider}
         />
-        
+
         {/* Slider Panel - Full height */}
-        <div 
+        <div
           className={`absolute right-0 top-0 h-full w-full max-w-2xl bg-white dark:bg-gray-900 shadow-2xl transform transition-transform duration-300 ease-in-out overflow-hidden ${
             isSliderOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
@@ -669,10 +690,10 @@ const Calendar: React.FC = () => {
             <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
               <div>
                 <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                  {selectedEvent ? "Edit Meeting" : "Schedule New Meeting"}
+                  {selectedEvent ? 'Edit Meeting' : 'Schedule New Meeting'}
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {selectedEvent ? "Update meeting details" : "Fill in all meeting information"}
+                  {selectedEvent ? 'Update meeting details' : 'Fill in all meeting information'}
                 </p>
                 {renderSystemInfo()}
               </div>
@@ -718,12 +739,16 @@ const Calendar: React.FC = () => {
                       className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-blue-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                     >
                       <option value="">Select Type</option>
-                      {meetingTypes.map(type => (
-                        <option key={type.id} value={type.name}>{type.name}</option>
+                      {meetingTypes.map((type) => (
+                        <option key={type.id} value={type.name}>
+                          {type.name}
+                        </option>
                       ))}
                     </select>
                     {meetingTypes.length === 0 && (
-                      <p className="text-xs text-red-500 mt-1">No meeting types found. Check API endpoint.</p>
+                      <p className="text-xs text-red-500 mt-1">
+                        No meeting types found. Check API endpoint.
+                      </p>
                     )}
                   </div>
 
@@ -738,14 +763,16 @@ const Calendar: React.FC = () => {
                       className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-blue-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                     >
                       <option value="">Select Status</option>
-                      {meetingStatuses.map(status => (
+                      {meetingStatuses.map((status) => (
                         <option key={status.id} value={status.name}>
                           {status.name}
                         </option>
                       ))}
                     </select>
                     {meetingStatuses.length === 0 && (
-                      <p className="text-xs text-red-500 mt-1">No statuses found. Check API endpoint.</p>
+                      <p className="text-xs text-red-500 mt-1">
+                        No statuses found. Check API endpoint.
+                      </p>
                     )}
                   </div>
                 </div>
@@ -793,12 +820,16 @@ const Calendar: React.FC = () => {
                       className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-blue-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                     >
                       <option value="">Select Location</option>
-                      {locations.map(location => (
-                        <option key={location.id} value={location.name}>{location.name}</option>
+                      {locations.map((location) => (
+                        <option key={location.id} value={location.name}>
+                          {location.name}
+                        </option>
                       ))}
                     </select>
                     {locations.length === 0 && (
-                      <p className="text-xs text-red-500 mt-1">No locations found. Check API endpoint.</p>
+                      <p className="text-xs text-red-500 mt-1">
+                        No locations found. Check API endpoint.
+                      </p>
                     )}
                   </div>
 
@@ -813,7 +844,7 @@ const Calendar: React.FC = () => {
                       className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-3 text-sm text-gray-800 focus:border-blue-500 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                     >
                       <option value="">Select Chair</option>
-                      {chairs.map(chair => (
+                      {chairs.map((chair) => (
                         <option key={chair.id} value={chair.id}>
                           {chair.name} ({chair.role})
                         </option>
@@ -830,7 +861,10 @@ const Calendar: React.FC = () => {
                 {/* Colour Selection from Categories */}
                 <div>
                   <label className="flex items-center mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <div className="h-4 w-4 mr-2 rounded-full" style={{ backgroundColor: formData.colour }} />
+                    <div
+                      className="h-4 w-4 mr-2 rounded-full"
+                      style={{ backgroundColor: formData.colour }}
+                    />
                     Meeting Colour
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -840,8 +874,8 @@ const Calendar: React.FC = () => {
                         type="button"
                         onClick={() => handleInputChange('colour', colour.value)}
                         className={`w-8 h-8 rounded-full border-2 transition-all ${
-                          formData.colour === colour.value 
-                            ? 'border-gray-800 dark:border-white scale-110' 
+                          formData.colour === colour.value
+                            ? 'border-gray-800 dark:border-white scale-110'
                             : 'border-gray-300 dark:border-gray-600 hover:scale-105'
                         }`}
                         style={{ backgroundColor: colour.value }}
@@ -850,7 +884,9 @@ const Calendar: React.FC = () => {
                     ))}
                   </div>
                   {colours.length === 0 && (
-                    <p className="text-xs text-gray-500 mt-1">Using default colours. Add colour categories via API.</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Using default colours. Add colour categories via API.
+                    </p>
                   )}
                 </div>
 
@@ -882,18 +918,25 @@ const Calendar: React.FC = () => {
                 </button>
                 <button
                   onClick={handleSubmit}
-                  disabled={isLoading || !formData.name || !formData.type || !formData.start_at || !formData.location || !formData.status}
+                  disabled={
+                    isLoading ||
+                    !formData.name ||
+                    !formData.type ||
+                    !formData.start_at ||
+                    !formData.location ||
+                    !formData.status
+                  }
                   className="flex items-center px-6 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      {selectedEvent ? "Updating..." : "Scheduling..."}
+                      {selectedEvent ? 'Updating...' : 'Scheduling...'}
                     </>
                   ) : (
                     <>
                       <CheckCircle className="h-4 w-4 mr-2" />
-                      {selectedEvent ? "Update Meeting" : "Schedule Meeting"}
+                      {selectedEvent ? 'Update Meeting' : 'Schedule Meeting'}
                     </>
                   )}
                 </button>
@@ -910,14 +953,14 @@ const Calendar: React.FC = () => {
 const getColourOptions = () => {
   // ... your existing getColourOptions implementation
   return [
-    { value: "#3b82f6", label: "Blue", bg: "bg-blue-500" },
-    { value: "#ef4444", label: "Red", bg: "bg-red-500" },
-    { value: "#10b981", label: "Green", bg: "bg-green-500" },
-    { value: "#f59e0b", label: "Yellow", bg: "bg-yellow-500" },
-    { value: "#8b5cf6", label: "Purple", bg: "bg-purple-500" },
-    { value: "#06b6d4", label: "Cyan", bg: "bg-cyan-500" },
-    { value: "#f97316", label: "Orange", bg: "bg-orange-500" },
-    { value: "#84cc16", label: "Lime", bg: "bg-lime-500" }
+    { value: '#3b82f6', label: 'Blue', bg: 'bg-blue-500' },
+    { value: '#ef4444', label: 'Red', bg: 'bg-red-500' },
+    { value: '#10b981', label: 'Green', bg: 'bg-green-500' },
+    { value: '#f59e0b', label: 'Yellow', bg: 'bg-yellow-500' },
+    { value: '#8b5cf6', label: 'Purple', bg: 'bg-purple-500' },
+    { value: '#06b6d4', label: 'Cyan', bg: 'bg-cyan-500' },
+    { value: '#f97316', label: 'Orange', bg: 'bg-orange-500' },
+    { value: '#84cc16', label: 'Lime', bg: 'bg-lime-500' },
   ];
 };
 
@@ -925,17 +968,18 @@ const renderEventContent = (eventInfo: EventContentArg) => {
   const colorClass = `fc-bg-${eventInfo.event.extendedProps.calendar?.toLowerCase() || 'primary'}`;
   const colour = eventInfo.event.extendedProps.colour || '#3b82f6';
   const status = eventInfo.event.extendedProps.status;
-  
+
   return (
     <div
       className={`event-fc-color flex fc-event-main ${colorClass} p-2 rounded-lg border-l-3 shadow-sm`}
-      style={{ 
+      style={{
         borderLeftColor: colour,
         backgroundColor: `${colour}15`,
-        border: `1px solid ${colour}20`
+        border: `1px solid ${colour}20`,
       }}
     >
-      <div className="fc-daygrid-event-dot"></div><br />
+      <div className="fc-daygrid-event-dot"></div>
+      <br />
       <div className="fc-event-time text-xs font-semibold text-gray-600 dark:text-gray-400">
         {eventInfo.timeText}
       </div>
@@ -944,10 +988,7 @@ const renderEventContent = (eventInfo: EventContentArg) => {
       </div>
       {status && (
         <div className="fc-event-status text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center">
-          <div 
-            className="w-2 h-2 rounded-full mr-1"
-            style={{ backgroundColor: colour }}
-          />
+          <div className="w-2 h-2 rounded-full mr-1" style={{ backgroundColor: colour }} />
           {status}
         </div>
       )}

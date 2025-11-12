@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
@@ -29,7 +29,7 @@ import {
   Maximize2,
   ZoomIn,
   ZoomOut,
-  RotateCcw
+  RotateCcw,
 } from 'lucide-react';
 import { formatSystemDate } from '@/lib/utils/date-utils';
 import FileIcon from '@/components/agenda/FileIcon';
@@ -138,7 +138,7 @@ const SingleMeeting: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [systemSettings, setSystemSettings] = useState<SystemSettings>({
     timezone: 'UTC',
-    date_format: 'YYYY-MM-DD'
+    date_format: 'YYYY-MM-DD',
   });
 
   // Document Viewer State
@@ -157,7 +157,7 @@ const SingleMeeting: React.FC = () => {
           const settings = await response.json();
           setSystemSettings({
             timezone: settings.timezone || 'UTC',
-            date_format: settings.date_format || 'YYYY-MM-DD'
+            date_format: settings.date_format || 'YYYY-MM-DD',
           });
         }
       } catch (error) {
@@ -171,7 +171,7 @@ const SingleMeeting: React.FC = () => {
   // Fetch meeting data with abort controller to prevent memory leaks
   useEffect(() => {
     const abortController = new AbortController();
-    
+
     const fetchData = async () => {
       if (!meetingId) return;
 
@@ -182,21 +182,21 @@ const SingleMeeting: React.FC = () => {
         console.log('🔄 Fetching meeting data for ID:', meetingId);
 
         const meetingResponse = await fetch(`/api/meetings/${meetingId}`, {
-          signal: abortController.signal
+          signal: abortController.signal,
         });
-        
+
         if (!meetingResponse.ok) {
           if (meetingResponse.status === 404) {
             throw new Error('Meeting not found');
           }
           throw new Error(`Failed to fetch meeting: ${meetingResponse.status}`);
         }
-        
+
         const meetingData = await meetingResponse.json();
         console.log('✅ Meeting data loaded:', meetingData);
-        
+
         setMeeting(meetingData);
-        
+
         // Set agenda from the meeting data
         if (meetingData.agenda) {
           // Fetch documents for each agenda item
@@ -213,13 +213,12 @@ const SingleMeeting: React.FC = () => {
                 console.error(`Error fetching documents for agenda ${agendaItem.id}:`, error);
                 return agendaItem;
               }
-            })
+            }),
           );
           setAgenda(agendaWithDocuments);
         } else {
           setAgenda([]);
         }
-
       } catch (err) {
         // Only set error if it's not an abort error
         if (err.name !== 'AbortError') {
@@ -240,18 +239,18 @@ const SingleMeeting: React.FC = () => {
   }, [meetingId]);
 
   // Get all documents from all agenda items
-  const allDocuments = agenda.flatMap(agendaItem => agendaItem.documents || []);
+  const allDocuments = agenda.flatMap((agendaItem) => agendaItem.documents || []);
 
   // Refresh meeting data after agenda operations
   const refreshMeetingData = async () => {
     try {
       console.log('🔄 Refreshing meeting data...');
       const meetingResponse = await fetch(`/api/meetings/${meetingId}`);
-      
+
       if (meetingResponse.ok) {
         const meetingData = await meetingResponse.json();
         setMeeting(meetingData);
-        
+
         if (meetingData.agenda) {
           // Fetch documents for each agenda item
           const agendaWithDocuments = await Promise.all(
@@ -267,13 +266,13 @@ const SingleMeeting: React.FC = () => {
                 console.error(`Error fetching documents for agenda ${agendaItem.id}:`, error);
                 return agendaItem;
               }
-            })
+            }),
           );
           setAgenda(agendaWithDocuments);
         } else {
           setAgenda([]);
         }
-        
+
         console.log('✅ Meeting data refreshed');
       }
     } catch (error) {
@@ -295,31 +294,37 @@ const SingleMeeting: React.FC = () => {
   // Handle agenda update from slideover
   const handleAgendaUpdate = (updatedAgenda: Agenda) => {
     console.log('🔄 Updating agenda in state:', updatedAgenda);
-    
+
     // Update agenda list
-    setAgenda(prev => prev.map(agendaItem => 
-      agendaItem.id === updatedAgenda.id ? updatedAgenda : agendaItem
-    ));
-    
+    setAgenda((prev) =>
+      prev.map((agendaItem) => (agendaItem.id === updatedAgenda.id ? updatedAgenda : agendaItem)),
+    );
+
     // Update selected agenda if it's the one being edited
     if (selectedAgenda?.id === updatedAgenda.id) {
       setSelectedAgenda(updatedAgenda);
     }
-    
+
     // Also update the meeting data
     if (meeting) {
-      setMeeting(prev => prev ? {
-        ...prev,
-        agenda: prev.agenda ? prev.agenda.map(agendaItem => 
-          agendaItem.id === updatedAgenda.id ? updatedAgenda : agendaItem
-        ) : [updatedAgenda]
-      } : null);
+      setMeeting((prev) =>
+        prev
+          ? {
+              ...prev,
+              agenda: prev.agenda
+                ? prev.agenda.map((agendaItem) =>
+                    agendaItem.id === updatedAgenda.id ? updatedAgenda : agendaItem,
+                  )
+                : [updatedAgenda],
+            }
+          : null,
+      );
     }
   };
 
   // Document Viewer Functions
   const openDocumentViewer = (document: AgendaDocument) => {
-    const documentIndex = allDocuments.findIndex(doc => doc.id === document.id);
+    const documentIndex = allDocuments.findIndex((doc) => doc.id === document.id);
     setSelectedDocument(document);
     setCurrentDocumentIndex(documentIndex);
     setZoomLevel(1);
@@ -352,11 +357,11 @@ const SingleMeeting: React.FC = () => {
   };
 
   const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(prev + 0.25, 3));
+    setZoomLevel((prev) => Math.min(prev + 0.25, 3));
   };
 
   const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(prev - 0.25, 0.5));
+    setZoomLevel((prev) => Math.max(prev - 0.25, 0.5));
   };
 
   const handleResetZoom = () => {
@@ -364,7 +369,7 @@ const SingleMeeting: React.FC = () => {
   };
 
   const handleRotate = () => {
-    setRotation(prev => (prev + 90) % 360);
+    setRotation((prev) => (prev + 90) % 360);
   };
 
   const handleFullscreen = () => {
@@ -426,9 +431,9 @@ const SingleMeeting: React.FC = () => {
       try {
         console.log('🔄 Fetching documents for agenda:', selectedAgenda.id);
         const response = await fetch(`/api/agenda/documents?agendaId=${selectedAgenda.id}`, {
-          signal: abortController.signal
+          signal: abortController.signal,
         });
-        
+
         if (response.ok) {
           const docs = await response.json();
           console.log('✅ Fetched documents:', docs);
@@ -465,7 +470,7 @@ const SingleMeeting: React.FC = () => {
     try {
       setIsUploading(true);
       console.log('🔄 Uploading file:', file.name);
-      
+
       const response = await fetch('/api/agenda/documents', {
         method: 'POST',
         body: formData,
@@ -474,22 +479,24 @@ const SingleMeeting: React.FC = () => {
       if (response.ok) {
         const newDoc = await response.json();
         console.log('✅ File uploaded:', newDoc);
-        
-        setDocuments(prev => [...prev, newDoc]);
+
+        setDocuments((prev) => [...prev, newDoc]);
         event.target.value = '';
-        
+
         // Update the selected agenda to reflect new document count
-        const updatedAgenda = { 
+        const updatedAgenda = {
           ...selectedAgenda,
-          documents: [...(selectedAgenda.documents || []), newDoc]
+          documents: [...(selectedAgenda.documents || []), newDoc],
         };
         setSelectedAgenda(updatedAgenda);
-        
+
         // Also update the agenda list
-        setAgenda(prev => prev.map(agendaItem => 
-          agendaItem.id === selectedAgenda.id ? updatedAgenda : agendaItem
-        ));
-        
+        setAgenda((prev) =>
+          prev.map((agendaItem) =>
+            agendaItem.id === selectedAgenda.id ? updatedAgenda : agendaItem,
+          ),
+        );
+
         alert('File uploaded successfully!');
       } else {
         const error = await response.json();
@@ -515,22 +522,24 @@ const SingleMeeting: React.FC = () => {
 
       if (response.ok) {
         console.log('✅ Document deleted');
-        setDocuments(prev => prev.filter(doc => doc.id !== documentId));
-        
+        setDocuments((prev) => prev.filter((doc) => doc.id !== documentId));
+
         // Update the selected agenda to reflect document removal
         if (selectedAgenda) {
           const updatedAgenda = {
             ...selectedAgenda,
-            documents: (selectedAgenda.documents || []).filter(doc => doc.id !== documentId)
+            documents: (selectedAgenda.documents || []).filter((doc) => doc.id !== documentId),
           };
           setSelectedAgenda(updatedAgenda);
-          
+
           // Also update the agenda list
-          setAgenda(prev => prev.map(agendaItem => 
-            agendaItem.id === selectedAgenda.id ? updatedAgenda : agendaItem
-          ));
+          setAgenda((prev) =>
+            prev.map((agendaItem) =>
+              agendaItem.id === selectedAgenda.id ? updatedAgenda : agendaItem,
+            ),
+          );
         }
-        
+
         alert('Document deleted successfully!');
       } else {
         const error = await response.json();
@@ -573,7 +582,11 @@ const SingleMeeting: React.FC = () => {
   const formatDate = (dateString: string): string => {
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return (
+        date.toLocaleDateString() +
+        ' ' +
+        date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      );
     } catch (error) {
       return 'Invalid date';
     }
@@ -584,14 +597,19 @@ const SingleMeeting: React.FC = () => {
   };
 
   const handleDelete = async () => {
-    if (!meeting || !confirm('Are you sure you want to delete this meeting? This will also delete all associated agenda and documents. This action cannot be undone.')) {
+    if (
+      !meeting ||
+      !confirm(
+        'Are you sure you want to delete this meeting? This will also delete all associated agenda and documents. This action cannot be undone.',
+      )
+    ) {
       return;
     }
 
     try {
       setIsDeleting(true);
       console.log('🔄 Deleting meeting:', meetingId);
-      
+
       const response = await fetch(`/api/meetings/${meetingId}`, {
         method: 'DELETE',
       });
@@ -600,11 +618,10 @@ const SingleMeeting: React.FC = () => {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to delete meeting');
       }
-      
+
       console.log('✅ Meeting deleted');
       router.push('/calendar');
       router.refresh();
-
     } catch (err) {
       console.error('❌ Error deleting meeting:', err);
       alert(err instanceof Error ? err.message : 'Failed to delete meeting. Please try again.');
@@ -615,34 +632,34 @@ const SingleMeeting: React.FC = () => {
 
   const getStatusIcon = (status: string | null | undefined) => {
     if (!status) return Clock;
-    
+
     const statusIcons: { [key: string]: any } = {
-      'scheduled': Clock,
-      'confirmed': CheckCircle,
+      scheduled: Clock,
+      confirmed: CheckCircle,
       'in progress': Loader2,
-      'completed': CheckCircle,
-      'cancelled': XCircle,
-      'postponed': Clock,
-      'draft': FileText
+      completed: CheckCircle,
+      cancelled: XCircle,
+      postponed: Clock,
+      draft: FileText,
     };
-    
+
     const normalizedStatus = status.toLowerCase();
     return statusIcons[normalizedStatus] || Clock;
   };
 
   const getStatusColor = (status: string | null | undefined) => {
     if (!status) return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-    
+
     const statusColors: { [key: string]: string } = {
-      'scheduled': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-      'confirmed': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+      scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+      confirmed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
       'in progress': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-      'completed': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-      'cancelled': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-      'postponed': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
-      'draft': 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+      completed: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+      cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+      postponed: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
+      draft: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
     };
-    
+
     const normalizedStatus = status.toLowerCase();
     return statusColors[normalizedStatus] || 'bg-gray-100 text-gray-800';
   };
@@ -667,27 +684,31 @@ const SingleMeeting: React.FC = () => {
     return (
       <div className="fixed inset-0 z-50 flex">
         {/* Backdrop */}
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-75 transition-opacity"
           onClick={closeDocumentViewer}
         />
-        
+
         {/* Document Viewer Panel - Takes half screen on the right */}
         <div className="fixed right-0 top-0 h-full w-1/2 bg-white dark:bg-gray-900 shadow-2xl flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
             <div className="flex items-center gap-3 min-w-0 flex-1">
-              <FileIcon fileType={selectedDocument.file_type} className="w-5 h-5 text-blue-500 flex-shrink-0" />
+              <FileIcon
+                fileType={selectedDocument.file_type}
+                className="w-5 h-5 text-blue-500 flex-shrink-0"
+              />
               <div className="min-w-0 flex-1">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
                   {selectedDocument.name}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {formatFileSize(selectedDocument.file_size)} • {currentDocumentIndex + 1} of {allDocuments.length}
+                  {formatFileSize(selectedDocument.file_size)} • {currentDocumentIndex + 1} of{' '}
+                  {allDocuments.length}
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2 flex-shrink-0">
               {/* Navigation Controls */}
               <div className="flex items-center gap-1 mr-4">
@@ -745,8 +766,18 @@ const SingleMeeting: React.FC = () => {
                       className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                       title="Rotate"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        />
                       </svg>
                     </button>
                   </>
@@ -781,7 +812,7 @@ const SingleMeeting: React.FC = () => {
           </div>
 
           {/* Document Content */}
-          <div 
+          <div
             id="document-viewer-content"
             className="flex-1 bg-gray-100 dark:bg-gray-800 overflow-auto flex items-center justify-center p-4"
           >
@@ -792,7 +823,7 @@ const SingleMeeting: React.FC = () => {
                 className="max-w-full max-h-full object-contain transition-transform duration-200"
                 style={{
                   transform: `scale(${zoomLevel}) rotate(${rotation}deg)`,
-                  cursor: zoomLevel > 1 ? 'grab' : 'default'
+                  cursor: zoomLevel > 1 ? 'grab' : 'default',
                 }}
                 onMouseDown={(e) => {
                   if (zoomLevel > 1) {
@@ -809,7 +840,7 @@ const SingleMeeting: React.FC = () => {
                       const y = e.clientY;
                       const walkX = (startX - x) * 2;
                       const walkY = (startY - y) * 2;
-                      
+
                       if (img.parentElement) {
                         img.parentElement.scrollLeft = scrollLeft + walkX;
                         img.parentElement.scrollTop = scrollTop + walkY;
@@ -836,7 +867,10 @@ const SingleMeeting: React.FC = () => {
               />
             ) : (
               <div className="text-center">
-                <FileIcon fileType={selectedDocument.file_type} className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <FileIcon
+                  fileType={selectedDocument.file_type}
+                  className="w-16 h-16 text-gray-400 mx-auto mb-4"
+                />
                 <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                   Preview not available
                 </p>
@@ -858,7 +892,8 @@ const SingleMeeting: React.FC = () => {
           <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
             <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
               <div>
-                Uploaded by {selectedDocument.uploaded_by_name || 'Unknown'} • {formatDate(selectedDocument.uploaded_at)}
+                Uploaded by {selectedDocument.uploaded_by_name || 'Unknown'} •{' '}
+                {formatDate(selectedDocument.uploaded_at)}
               </div>
               <div className="flex items-center gap-4">
                 <span>Use arrow keys to navigate</span>
@@ -875,10 +910,14 @@ const SingleMeeting: React.FC = () => {
   const renderMeetingDetails = () => (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/3">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Meeting Information</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">
+          Meeting Information
+        </h3>
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Meeting Type</label>
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Meeting Type
+            </label>
             <p className="text-sm text-gray-900 dark:text-white mt-1">{meeting.type}</p>
           </div>
           <div>
@@ -903,7 +942,9 @@ const SingleMeeting: React.FC = () => {
         <div className="space-y-4">
           {meeting.chair_name && (
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Chair Person</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Chair Person
+              </label>
               <div className="flex items-center mt-1">
                 <User className="h-4 w-4 text-gray-400 mr-2" />
                 <div>
@@ -912,7 +953,9 @@ const SingleMeeting: React.FC = () => {
                     <p className="text-xs text-gray-500 dark:text-gray-400">{meeting.chair_role}</p>
                   )}
                   {meeting.chair_email && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{meeting.chair_email}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {meeting.chair_email}
+                    </p>
                   )}
                 </div>
               </div>
@@ -966,7 +1009,10 @@ const SingleMeeting: React.FC = () => {
               onClick={() => openDocumentViewer(document)}
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <FileIcon fileType={document.file_type} className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                <FileIcon
+                  fileType={document.file_type}
+                  className="w-4 h-4 text-blue-500 flex-shrink-0"
+                />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                     {document.name}
@@ -1029,7 +1075,9 @@ const SingleMeeting: React.FC = () => {
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center">
           <XCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Meeting Not Found</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            Meeting Not Found
+          </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
           <button
             onClick={() => router.push('/calendar')}
@@ -1077,7 +1125,9 @@ const SingleMeeting: React.FC = () => {
             <span className="text-base font-medium text-gray-700 dark:text-gray-400">
               Meeting: {meeting.name}
             </span>
-            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(meeting.status)}`}>
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(meeting.status)}`}
+            >
               <StatusIcon className="h-3 w-3 mr-1" />
               {meeting.status}
             </span>
@@ -1086,7 +1136,7 @@ const SingleMeeting: React.FC = () => {
             Date: {formatMeetingDate(meeting.start_at, true)}
           </p>
         </div>
-        
+
         <div className="flex gap-3">
           <button
             onClick={handleEdit}
@@ -1115,17 +1165,16 @@ const SingleMeeting: React.FC = () => {
 
       {/* Quick Add Agenda */}
       <div className="mb-6">
-        <QuickAddAgenda 
-          meetingId={meetingId} 
-          onAgendaAdded={handleAgendaAdded} 
-        />
+        <QuickAddAgenda meetingId={meetingId} onAgendaAdded={handleAgendaAdded} />
       </div>
 
       {/* Agenda Section - Full Width */}
       <div className="w-full">
         <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/3">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">Meeting Agenda</h2>
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+              Meeting Agenda
+            </h2>
             <div className="text-sm text-gray-500 dark:text-gray-400">
               {agenda.length} item{agenda.length !== 1 ? 's' : ''}
             </div>
@@ -1160,7 +1209,9 @@ const SingleMeeting: React.FC = () => {
                         <h3 className="font-medium text-gray-900 dark:text-white">
                           {agendaItem.name}
                         </h3>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${getStatusColor(agendaItem.status)}`}>
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${getStatusColor(agendaItem.status)}`}
+                        >
                           {agendaItem.status}
                         </span>
                         {agendaItem.cabinet_approval_required && (
@@ -1179,7 +1230,7 @@ const SingleMeeting: React.FC = () => {
                           Presenter: {agendaItem.presenter_id}
                         </p>
                       )}
-                      
+
                       {/* Render documents for this agenda item */}
                       {renderAgendaDocuments(agendaItem)}
                     </div>

@@ -1,10 +1,10 @@
 // app/(admin)/memos/create/page.tsx
-import type { Metadata } from "next";
-import CreateMemoForm from "@/components/memos/CreateMemoForm";
+import type { Metadata } from 'next';
+import CreateMemoForm from '@/components/memos/CreateMemoForm';
 
 export const metadata: Metadata = {
-  title: "Create Government Memo | E-Cabinet System",
-  description: "Create a new government memo for cabinet consideration",
+  title: 'Create Government Memo | E-Cabinet System',
+  description: 'Create a new government memo for cabinet consideration',
 };
 
 export default function CreateMemoPage() {

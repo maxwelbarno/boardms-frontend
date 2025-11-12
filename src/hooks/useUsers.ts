@@ -28,7 +28,7 @@ export function useUsers(filters?: { role?: string }) {
 
         const response = await fetch(`/api/users?${params}`);
         if (!response.ok) throw new Error('Failed to fetch users');
-        
+
         const data = await response.json();
         setUsers(data);
       } catch (err) {

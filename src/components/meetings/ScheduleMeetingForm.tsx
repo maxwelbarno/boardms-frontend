@@ -1,63 +1,65 @@
 // app/components/meetings/ScheduleMeetingForm.tsx
-"use client";
-import React, { useState } from "react";
-import Input from "@/components/form/input/InputField";
-import Label from "@/components/form/Label";
-import Button from "@/components/ui/button/Button";
+'use client';
+import React, { useState } from 'react';
+import Input from '@/components/form/input/InputField';
+import Label from '@/components/form/Label';
+import Button from '@/components/ui/button/Button';
 
 const committees = [
-  { id: "infrastructure", name: "Infrastructure & Energy Committee" },
-  { id: "finance", name: "Budget & Finance Committee" },
-  { id: "social", name: "Social Services Committee" },
-  { id: "security", name: "Security & Administration Committee" },
-  { id: "cabinet", name: "Full Cabinet Meeting" },
+  { id: 'infrastructure', name: 'Infrastructure & Energy Committee' },
+  { id: 'finance', name: 'Budget & Finance Committee' },
+  { id: 'social', name: 'Social Services Committee' },
+  { id: 'security', name: 'Security & Administration Committee' },
+  { id: 'cabinet', name: 'Full Cabinet Meeting' },
 ];
 
 const meetingTypes = [
-  { id: "regular", name: "Regular Meeting" },
-  { id: "special", name: "Special Session" },
-  { id: "emergency", name: "Emergency Meeting" },
+  { id: 'regular', name: 'Regular Meeting' },
+  { id: 'special', name: 'Special Session' },
+  { id: 'emergency', name: 'Emergency Meeting' },
 ];
 
 export default function ScheduleMeetingForm() {
   const [formData, setFormData] = useState({
-    title: "",
-    committee: "",
-    type: "regular",
-    date: "",
-    time: "",
-    duration: "60",
-    location: "",
-    description: "",
+    title: '',
+    committee: '',
+    type: 'regular',
+    date: '',
+    time: '',
+    duration: '60',
+    location: '',
+    description: '',
     agendaItems: [] as string[],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    console.log("Meeting scheduled:", formData);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    console.log('Meeting scheduled:', formData);
     setIsSubmitting(false);
-    
+
     // Reset form
     setFormData({
-      title: "",
-      committee: "",
-      type: "regular",
-      date: "",
-      time: "",
-      duration: "60",
-      location: "",
-      description: "",
+      title: '',
+      committee: '',
+      type: 'regular',
+      date: '',
+      time: '',
+      duration: '60',
+      location: '',
+      description: '',
       agendaItems: [],
     });
   };
@@ -65,11 +67,9 @@ export default function ScheduleMeetingForm() {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xs border border-gray-200 dark:border-gray-700">
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Meeting Details
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Meeting Details</h2>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         {/* Basic Information */}
         <div>
@@ -100,7 +100,7 @@ export default function ScheduleMeetingForm() {
               required
             >
               <option value="">Select committee</option>
-              {committees.map(committee => (
+              {committees.map((committee) => (
                 <option key={committee.id} value={committee.id}>
                   {committee.name}
                 </option>
@@ -117,7 +117,7 @@ export default function ScheduleMeetingForm() {
               onChange={handleInputChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
-              {meetingTypes.map(type => (
+              {meetingTypes.map((type) => (
                 <option key={type.id} value={type.id}>
                   {type.name}
                 </option>
@@ -202,18 +202,11 @@ export default function ScheduleMeetingForm() {
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => window.history.back()}
-          >
+          <Button type="button" variant="outline" onClick={() => window.history.back()}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Scheduling..." : "Schedule Meeting"}
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'Scheduling...' : 'Schedule Meeting'}
           </Button>
         </div>
       </form>
