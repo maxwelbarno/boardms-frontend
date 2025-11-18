@@ -7,34 +7,19 @@ import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from '@/icons';
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn, getSession } from 'next-auth/react';
 import ErrorModal from '@/components/ui/modal/ErrorModal';
-
-interface SystemStatus {
-  database: { healthy: boolean; error?: string; users?: any[] };
-  users: { total: number; hasUsers: boolean; list: any[] };
-  environment: {
-    nodeEnv: string;
-    hasAuthSecret: boolean;
-    hasDatabaseUrl: boolean;
-  };
-}
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
-  const [showDiagnostics, setShowDiagnostics] = useState(false);
-  const [showUserList, setShowUserList] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorDetails, setErrorDetails] = useState<any>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevent default form submission
-    setIsLoading(true);
     setError('');
     setShowErrorModal(false);
 
@@ -42,73 +27,18 @@ export default function SignInForm() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
-    console.log('🔐 Client-side authentication attempt:', { email });
-
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false, // Important: prevent automatic redirect
+      const res = await fetch('http://localhost:3000/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ username: email, password }),
       });
 
-      console.log('📨 SignIn response:', result);
-
-      if (result?.error) {
-        // Parse the detailed error from our enhanced auth system
-        try {
-          const errorData = JSON.parse(result.error);
-          console.log('🔴 Parsed error details:', errorData);
-
-          // Format user-friendly message with details
-          let userMessage = errorData.message;
-
-          if (errorData.details?.availableUsers) {
-            userMessage += `\n\nAvailable users:\n${errorData.details.availableUsers.join('\n')}`;
-          }
-
-          if (errorData.details?.suggestion) {
-            userMessage += `\n\n💡 ${errorData.details.suggestion}`;
-          }
-
-          setError(userMessage);
-          setErrorDetails(errorData.details);
-          setShowErrorModal(true);
-        } catch (parseError) {
-          // If it's not our formatted error, return as is
-          console.log('⚠️ Could not parse error, returning raw:', result.error);
-          setError(result.error || 'Authentication failed');
-          setErrorDetails({ rawError: result.error });
-          setShowErrorModal(true);
-        }
-      } else if (result?.ok) {
-        console.log('✅ SignIn successful, checking session...');
-
-        // Wait a moment for the session to be set
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        // Get the updated session
-        const session = await getSession();
-        console.log('🔍 Session after signin:', session);
-
-        if (session) {
-          console.log('🎯 Redirecting to dashboard...');
-          // Use router.push for client-side navigation (stays on same page until successful)
-          router.push('/dashboard');
-          // Optional: Force refresh to ensure session is loaded
-          setTimeout(() => {
-            router.refresh();
-          }, 100);
-        } else {
-          setError('Authentication successful but session not found. Please try again.');
-          setErrorDetails({
-            sessionCheck: 'Session was null after successful signin',
-          });
-          setShowErrorModal(true);
-        }
+      if (res.ok) {
+        router.push('/dashboard');
       } else {
-        setError('Unknown authentication error - no response received');
-        setErrorDetails({ result });
-        setShowErrorModal(true);
+        const data = await res.json();
+        setError(data.error);
       }
     } catch (error) {
       console.error('💥 Auth error:', error);
@@ -124,47 +54,11 @@ export default function SignInForm() {
     }
   };
 
-  const fillDemoCredentials = () => {
-    const emailInput = document.querySelector('input[name="email"]') as HTMLInputElement;
-    const passwordInput = document.querySelector('input[name="password"]') as HTMLInputElement;
-
-    if (emailInput && passwordInput) {
-      // Use the first available user email or fallback to demo
-      const firstUser = systemStatus?.users.list[0];
-      if (firstUser) {
-        emailInput.value = firstUser.email;
-      } else {
-        emailInput.value = 'president@president.go.ke';
-      }
-      passwordInput.value = 'admin123';
-    }
-  };
-
   const closeErrorModal = () => {
     setShowErrorModal(false);
     setError('');
     setErrorDetails(null);
   };
-
-  // Prevent any background navigation when modal is open
-  useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      if (showErrorModal) {
-        // If modal is open, prevent navigation
-        window.history.pushState(null, '', window.location.href);
-        event.preventDefault();
-      }
-    };
-
-    if (showErrorModal) {
-      window.history.pushState(null, '', window.location.href);
-      window.addEventListener('popstate', handlePopState);
-    }
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, [showErrorModal]);
 
   return (
     <>
@@ -203,7 +97,7 @@ export default function SignInForm() {
               <div className="space-y-6">
                 <div>
                   <Label>
-                    Email <span className="text-error-500">*</span>{' '}
+                    Username <span className="text-error-500">*</span>{' '}
                   </Label>
                   <Input
                     placeholder="your.email@gov.go.ke"
@@ -250,29 +144,12 @@ export default function SignInForm() {
                   </Link>
                 </div>
                 <div>
-                  <Button
-                    className="w-full"
-                    size="sm"
-                    type="submit"
-                    disabled={
-                      isLoading ||
-                      (systemStatus && !systemStatus.database.healthy) ||
-                      showErrorModal
-                    }
-                  >
+                  <Button className="w-full" size="sm" type="submit">
                     {isLoading ? 'Signing in...' : 'Sign in'}
                   </Button>
                 </div>
               </div>
             </form>
-
-            <div className="mt-5">
-              {systemStatus && !systemStatus.users.hasUsers && (
-                <p className="text-xs text-center text-red-500 mt-2">
-                  ⚠️ No users found in database. Run: npm run db:seed
-                </p>
-              )}
-            </div>
           </div>
         </div>
       </div>
