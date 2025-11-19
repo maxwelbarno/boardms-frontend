@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -10,6 +9,7 @@ import Label from '../ui/input/Label';
 import Input from '../ui/input/Input';
 import Button from '../ui/input/Button';
 import { useAuth } from '@/context/AuthContext';
+import { EyeCloseIcon, EyeIcon } from '@/assets/icons';
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -43,7 +43,6 @@ export default function LoginForm() {
       if (res.ok) {
         router.push('/dashboard');
       } else {
-        // const data = await res.json();
         setError(result.error);
       }
     } catch (error) {
@@ -128,9 +127,9 @@ export default function LoginForm() {
                       className='absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2'
                     >
                       {showPassword ? (
-                        <Eye className='fill-gray-500 dark:fill-gray-400' />
+                        <EyeIcon className='fill-gray-500 dark:fill-gray-400' />
                       ) : (
-                        <EyeOff className='fill-gray-500 dark:fill-gray-400' />
+                        <EyeCloseIcon className='fill-gray-500 dark:fill-gray-400' />
                       )}
                     </span>
                   </div>

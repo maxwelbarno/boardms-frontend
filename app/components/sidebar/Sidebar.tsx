@@ -1,28 +1,20 @@
 'use client';
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { useSidebar } from '@/context/SidebarContext';
-import {
-  ChevronDownIcon,
-  HorizontaLDots,
-  DashboardIcon,
-  DocumentIcon,
-  MeetingIcon,
-  GroupIcon,
-  ChartIcon,
-  SettingsIcon,
-  AuditIcon,
-  PageIcon,
-} from '@/assets/icons';
 
-type NavItem = {
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { ChevronDownIcon, DashboardIcon, HorizontaLDots } from '@/assets/icons/index';
+
+import { useSidebar } from '@/context/SidebarContext';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+interface NavItem {
   name: string;
   icon: React.ReactNode;
   path?: string;
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
-};
+}
 
 const navItems: NavItem[] = [
   {
@@ -30,72 +22,9 @@ const navItems: NavItem[] = [
     name: 'Dashboard',
     path: '/dashboard',
   },
-  {
-    icon: <DocumentIcon />,
-    name: 'Government Memos',
-    subItems: [
-      { name: 'My Memos', path: '/memos' },
-      { name: 'All Memos', path: '/memos/all' },
-    ],
-  },
-  {
-    icon: <PageIcon />,
-    name: 'Agenda & Books',
-    subItems: [
-      { name: 'All Agenda', path: '/agenda' },
-      { name: 'Create Agenda', path: '/agenda/create' },
-      {
-        name: 'Committee Agenda Books',
-        path: '/committees/infrastructure/tier1-agenda',
-      },
-      { name: 'Cabinet Agenda Books', path: '/cabinet/tier2-agenda' },
-    ],
-  },
-
-  {
-    icon: <MeetingIcon />,
-    name: 'Meetings',
-    subItems: [
-      { name: 'Schedule Meeting', path: '/meetings/schedule' },
-      { name: 'Meeting Calendar', path: '/meetings/calendar' },
-      { name: 'Meeting Minutes', path: '/meetings/minutes' },
-    ],
-  },
-  {
-    icon: <DocumentIcon />,
-    name: 'Resources',
-    path: '/resources',
-  },
 ];
 
-const managementItems: NavItem[] = [
-  {
-    icon: <GroupIcon />,
-    name: 'User Management',
-    subItems: [
-      { name: 'All Users', path: '/users' },
-      { name: 'Roles & Permissions', path: '/users/roles' },
-      { name: 'MDAs', path: '/users/mdas' },
-    ],
-  },
-  {
-    icon: <ChartIcon />,
-    name: 'Reports & Analytics',
-    path: '/reports',
-  },
-  {
-    icon: <AuditIcon />,
-    name: 'Audit Trail',
-    path: '/audit',
-  },
-  {
-    icon: <SettingsIcon />,
-    name: 'System Settings',
-    path: '/settings',
-  },
-];
-
-const AppSidebar: React.FC = () => {
+const Sidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
 
@@ -112,7 +41,7 @@ const AppSidebar: React.FC = () => {
     // Check if the current path matches any submenu item
     let submenuMatched = false;
     ['main', 'management'].forEach((menuType) => {
-      const items = menuType === 'main' ? navItems : managementItems;
+      const items = menuType === 'main' ? navItems : [];
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
@@ -291,14 +220,14 @@ const AppSidebar: React.FC = () => {
         <Link href='/dashboard'>
           {isExpanded || isHovered || isMobileOpen ? (
             <>
-              <div className='flex items-center space-x-2'>
+              <div className='flex items-center space-x-12 w-20 h-20'>
                 <Image
                   priority
                   className='dark:hidden w-full h-auto'
                   src='/images/logo/logo.svg'
                   alt='E-Cabinet Logo'
-                  width={80}
-                  height={40}
+                  width={20}
+                  height={20}
                 />
                 <span className='text-xl font-semibold text-gray-800 dark:text-white'>BoardMS</span>
               </div>
@@ -308,7 +237,7 @@ const AppSidebar: React.FC = () => {
                 className='hidden dark:block w-full h-auto'
                 src='/images/logo/logo.svg'
                 alt='E-Cabinet Logo'
-                width={150}
+                width={80}
                 height={40}
               />
             </>
@@ -331,7 +260,7 @@ const AppSidebar: React.FC = () => {
               {renderMenuItems(navItems, 'main')}
             </div>
 
-            <div className=''>
+            {/* <div className=''>
               <h2
                 className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
                   !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
@@ -340,7 +269,7 @@ const AppSidebar: React.FC = () => {
                 {isExpanded || isHovered || isMobileOpen ? 'Management' : <HorizontaLDots />}
               </h2>
               {renderMenuItems(managementItems, 'management')}
-            </div>
+            </div> */}
           </div>
         </nav>
       </div>
@@ -348,4 +277,4 @@ const AppSidebar: React.FC = () => {
   );
 };
 
-export default AppSidebar;
+export default Sidebar;

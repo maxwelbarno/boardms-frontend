@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { useSidebar } from '@/context/SidebarContext';
-import { Sidebar } from 'lucide-react';
 import Backdrop from '../components/sidebar/Backdrop';
+import Sidebar from '../components/sidebar/Sidebar';
 import Header from '../components/header/Header';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -17,6 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className='min-h-screen xl:flex bg-gray-50 dark:bg-gray-900'>
+      {/* <Sidebar /> */}
       <Sidebar />
       <Backdrop />
       <div className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}>
