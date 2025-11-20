@@ -24,7 +24,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         headers: { 'Content-Type': 'application/json' },
       });
       const result = await data.json();
-      console.log(result);
       setAccessToken(result.accessToken);
     } catch (error) {
       console.log('Refresh failed: ', error);
