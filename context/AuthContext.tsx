@@ -8,12 +8,14 @@ interface AuthContextType {
   setAccessToken: (token: string | null) => void;
   refresh: () => Promise<void>;
   logout: () => Promise<void>;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   const refresh = async () => {
@@ -28,6 +30,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.log('Refresh failed: ', error);
       setAccessToken(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,7 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await fetch('http://localhost:3000/api/v1/auth/logout');
     } finally {
       setAccessToken(null);
-      router.push('/signin');
+      router.push('/login');
     }
   };
 
@@ -45,7 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ accessToken, setAccessToken, refresh, logout }}>
+    <AuthContext.Provider value={{ accessToken, setAccessToken, refresh, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

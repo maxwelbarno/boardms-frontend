@@ -7,6 +7,11 @@ const outfit = Outfit({
   subsets: ['latin'],
 });
 
+export const metadata: Metadata = {
+  title: 'BoardMS',
+  description: 'Board Management System for Government Workflow Management',
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

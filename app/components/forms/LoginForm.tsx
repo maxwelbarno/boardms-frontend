@@ -33,8 +33,9 @@ export default function LoginForm() {
     try {
       const res = await fetch('http://localhost:3000/api/v1/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ username, password }),
+        credentials: 'include',
       });
 
       const result = await res.json();
