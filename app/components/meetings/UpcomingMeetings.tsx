@@ -4,27 +4,6 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import TodaysMeetings from './TodaysMeetings';
-interface Committee {
-  id: number;
-  name: string;
-}
-interface Meeting {
-  id: string;
-  name: string;
-  type: string;
-  startAt: string;
-  location: string;
-  chairId: string;
-  status: string;
-  description?: string;
-  color: string;
-  committee?: Committee;
-  attendeesCount?: number;
-}
-
-interface GroupedMeetings {
-  [key: string]: Meeting[];
-}
 
 const UpcomingMeetings = () => {
   const { accessToken } = useAuth();
@@ -375,17 +354,6 @@ const UpcomingMeetings = () => {
                                 </svg>
                                 <span className='font-medium'>{meeting.location}</span>
                               </div>
-
-                              {meeting.attendeesCount && (
-                                <div className='flex items-center gap-2 text-base text-gray-700 dark:text-gray-300'>
-                                  <svg className='w-5 h-5' fill='currentColor' viewBox='0 0 20 20'>
-                                    <path d='M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z' />
-                                  </svg>
-                                  <span className='font-medium'>
-                                    {meeting.attendeesCount} attendees
-                                  </span>
-                                </div>
-                              )}
                             </div>
 
                             {meeting.description && (
@@ -512,21 +480,6 @@ const UpcomingMeetings = () => {
                                       <span className='font-medium'>{meeting.location}</span>
                                     </div>
                                   </div>
-
-                                  {meeting.attendeesCount && (
-                                    <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400'>
-                                      <svg
-                                        className='w-4 h-4'
-                                        fill='currentColor'
-                                        viewBox='0 0 20 20'
-                                      >
-                                        <path d='M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z' />
-                                      </svg>
-                                      <span className='font-medium'>
-                                        {meeting.attendeesCount} attendees
-                                      </span>
-                                    </div>
-                                  )}
 
                                   {meeting.description && (
                                     <p className='text-sm text-gray-600 dark:text-gray-400 mt-2 line-clamp-2'>

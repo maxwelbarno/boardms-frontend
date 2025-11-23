@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { ChevronDownIcon, DashboardIcon, HorizontaLDots } from '@/assets/icons/index';
+import { ChevronDownIcon, DashboardIcon, HorizontaLDots, MeetingIcon } from '@/assets/icons/index';
 
 import { useSidebar } from '@/context/SidebarContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { GroupIcon } from 'lucide-react';
 
 interface NavItem {
   name: string;
@@ -21,6 +22,27 @@ const navItems: NavItem[] = [
     icon: <DashboardIcon />,
     name: 'Dashboard',
     path: '/dashboard',
+  },
+  {
+    icon: <MeetingIcon />,
+    name: 'Meetings',
+    subItems: [
+      { name: 'Schedule Meeting', path: '/meetings/schedule' },
+      { name: 'Meeting Calendar', path: '/meetings/calendar' },
+      { name: 'Meeting Minutes', path: '/meetings/minutes' },
+    ],
+  },
+];
+
+const managementItems: NavItem[] = [
+  {
+    icon: <GroupIcon />,
+    name: 'User Management',
+    subItems: [
+      { name: 'All Users', path: '/users' },
+      { name: 'Roles & Permissions', path: '/users/roles' },
+      { name: 'MDAs', path: '/users/mdas' },
+    ],
   },
 ];
 
@@ -41,7 +63,7 @@ const Sidebar: React.FC = () => {
     // Check if the current path matches any submenu item
     let submenuMatched = false;
     ['main', 'management'].forEach((menuType) => {
-      const items = menuType === 'main' ? navItems : [];
+      const items = menuType === 'main' ? navItems : managementItems;
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
@@ -85,7 +107,7 @@ const Sidebar: React.FC = () => {
     });
   };
 
-  const renderMenuItems = (navItems: NavItem[], menuType: 'main' | 'management') => (
+  const displayMenuItems = (navItems: NavItem[], menuType: 'main' | 'management') => (
     <ul className='flex flex-col gap-4'>
       {navItems.map((nav, index) => (
         <li key={nav.name}>
@@ -257,10 +279,10 @@ const Sidebar: React.FC = () => {
               >
                 {isExpanded || isHovered || isMobileOpen ? 'Main Menu' : <HorizontaLDots />}
               </h2>
-              {renderMenuItems(navItems, 'main')}
+              {displayMenuItems(navItems, 'main')}
             </div>
 
-            {/* <div className=''>
+            <div className=''>
               <h2
                 className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
                   !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start'
@@ -268,8 +290,8 @@ const Sidebar: React.FC = () => {
               >
                 {isExpanded || isHovered || isMobileOpen ? 'Management' : <HorizontaLDots />}
               </h2>
-              {renderMenuItems(managementItems, 'management')}
-            </div> */}
+              {displayMenuItems(managementItems, 'management')}
+            </div>
           </div>
         </nav>
       </div>
